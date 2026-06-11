@@ -1,0 +1,37 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const formatDate = (d: Date) =>
+  d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<Base title="Блог — Александр Карпов" description="Статьи и обзоры о праве ГЧП, концессиях и проектном финансировании.">
+  <h1>Блог</h1>
+  <p class="subtitle" style="color: var(--text-muted); margin-top: 0.5rem;">
+    Статьи и обзоры о праве ГЧП, концессиях и проектном финансировании.
+  </p>
+
+  {posts.length === 0 ? (
+    <div class="callout">
+      <p>
+        Здесь скоро появятся развёрнутые материалы. Пока — короткие форматы в телеграм-канале
+        <a href="https://t.me/pmgchp" target="_blank" rel="noopener">«Правовой мониторинг ГЧП»</a>
+        и посты на <a href="https://boosty.to/avkarpov" target="_blank" rel="noopener">Boosty</a>.
+      </p>
+    </div>
+  ) : (
+    <ul class="post-list">
+      {posts.map((post) => (
+        <li>
+          <span class="post-date">{formatDate(post.data.date)}</span>
+          <h3><a href={`/blog/${post.id}/`}>{post.data.title}</a></h3>
+          {post.data.description && <p class="excerpt">{post.data.description}</p>}
+        </li>
+      ))}
+    </ul>
+  )}
+</Base>
