@@ -1,8 +1,38 @@
 ---
 import Base from '../layouts/Base.astro';
+
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Александр Карпов',
+  alternateName: 'Карпов Александр Витальевич',
+  url: 'https://pmgchp.ru/',
+  image: 'https://pmgchp.ru/images/photo.jpg',
+  jobTitle: 'Юрист по проектному финансированию и государственно-частному партнёрству',
+  description: 'Юрист, специализирующийся на структурировании и сопровождении сделок проектного финансирования и ГЧП. Автор телеграм-канала «Правовой мониторинг ГЧП». Преподаватель факультета права НИУ ВШЭ.',
+  email: 'mailto:pmgchp@gmail.com',
+  knowsAbout: ['ГЧП', 'государственно-частное партнёрство', 'концессионные соглашения', 'проектное финансирование', 'инфраструктурные проекты', '115-ФЗ', '224-ФЗ', 'СЗПК'],
+  sameAs: [
+    'https://t.me/pmgchp',
+    'https://boosty.to/avkarpov',
+    'https://www.linkedin.com/in/karpovav',
+  ],
+};
+
+const siteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Правовой мониторинг ГЧП',
+  alternateName: 'Сайт Александра Карпова',
+  url: 'https://pmgchp.ru/',
+  inLanguage: 'ru-RU',
+  author: { '@type': 'Person', name: 'Александр Карпов' },
+};
 ---
 
-<Base title="Александр Карпов — юрист по проектному финансированию и ГЧП">
+<Base title="Александр Карпов — юрист по проектному финансированию и ГЧП | Правовой мониторинг ГЧП">
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(personLd)} />
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(siteLd)} />
   <section class="hero">
     <div class="hero-top">
       <div class="hero-text">

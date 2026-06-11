@@ -17,7 +17,7 @@ const formatDate = (d: Date) =>
   d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
 
-<Base title={`${post.data.title} — Александр Карпов`} description={post.data.description}>
+<Base title={`${post.data.title} — Правовой мониторинг ГЧП`} description={post.data.description} ogType="article" publishDate={post.data.date}>
   <article>
     <header class="article-header">
       <p class="post-date">{formatDate(post.data.date)}</p>
