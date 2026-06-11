@@ -28,6 +28,11 @@ body {
   font-size: 17px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+}
+
+.prose a {
+  overflow-wrap: anywhere;
 }
 
 h1, h2, h3 {
