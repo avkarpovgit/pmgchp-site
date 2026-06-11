@@ -133,6 +133,12 @@ main {
   border-bottom-color: var(--border);
 }
 
+.footer-legal {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
 /* Hero */
 .hero h1 {
   margin-bottom: 0.5rem;
