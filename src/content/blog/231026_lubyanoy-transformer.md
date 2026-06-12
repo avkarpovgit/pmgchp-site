@@ -31,4 +31,4 @@ date: 2023-10-26
 
 ---
 
-*Впервые опубликовано 26.10.2023 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/dbe2c1ea-d2db-4375-a71d-8b57a2e24003).*
+*Впервые опубликовано 26.10.2023 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/231). [Пост на Boosty](https://boosty.to/avkarpov/posts/dbe2c1ea-d2db-4375-a71d-8b57a2e24003).*

@@ -24,4 +24,4 @@ date: 2025-10-10
 
 ---
 
-*Впервые опубликовано 10.10.2025 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/55723b98-a5e3-4c5a-96d4-4ebadfeb7438).*
+*Впервые опубликовано 10.10.2025 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/303). [Пост на Boosty](https://boosty.to/avkarpov/posts/55723b98-a5e3-4c5a-96d4-4ebadfeb7438).*

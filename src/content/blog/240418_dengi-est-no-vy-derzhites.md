@@ -84,4 +84,4 @@ date: 2024-04-18
 
 ---
 
-*Впервые опубликовано 18.04.2024 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/37bc92ed-2e38-423a-a298-c77a08b048c2).*
+*Впервые опубликовано 18.04.2024 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/250). [Пост на Boosty](https://boosty.to/avkarpov/posts/37bc92ed-2e38-423a-a298-c77a08b048c2).*

@@ -28,4 +28,4 @@ date: 2021-08-25
 
 ---
 
-*Впервые опубликовано 25.08.2021 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/0db56faa-d86e-47c0-8d1d-f256345d1aa1).*
+*Впервые опубликовано 25.08.2021 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/98). [Пост на Boosty](https://boosty.to/avkarpov/posts/0db56faa-d86e-47c0-8d1d-f256345d1aa1).*

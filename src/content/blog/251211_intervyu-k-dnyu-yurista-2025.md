@@ -67,4 +67,4 @@ date: 2025-12-11
 
 ---
 
-*Впервые опубликовано 11.12.2025 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/db7060ad-a8d5-4575-bb07-ec9d30abf1a9).*
+*Впервые опубликовано 11.12.2025 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/308). [Пост на Boosty](https://boosty.to/avkarpov/posts/db7060ad-a8d5-4575-bb07-ec9d30abf1a9).*

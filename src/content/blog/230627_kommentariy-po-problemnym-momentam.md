@@ -115,4 +115,4 @@ date: 2023-06-27
 
 ---
 
-*Впервые опубликовано 27.06.2023 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/bdb9456d-41c9-413f-a115-291bf32b3480).*
+*Впервые опубликовано 27.06.2023 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/207). [Пост на Boosty](https://boosty.to/avkarpov/posts/bdb9456d-41c9-413f-a115-291bf32b3480).*

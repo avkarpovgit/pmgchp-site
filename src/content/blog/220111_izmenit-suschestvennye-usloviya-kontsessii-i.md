@@ -23,4 +23,4 @@ date: 2022-01-11
 
 ---
 
-*Впервые опубликовано 11.01.2022 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/ef95f913-f068-4bfd-b7cd-ada594631126).*
+*Впервые опубликовано 11.01.2022 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/107). [Пост на Boosty](https://boosty.to/avkarpov/posts/ef95f913-f068-4bfd-b7cd-ada594631126).*

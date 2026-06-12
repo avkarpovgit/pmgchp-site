@@ -22,4 +22,4 @@ date: 2020-10-13
 
 ---
 
-*Впервые опубликовано 13.10.2020 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/5f492034-b5b2-4a19-9bc3-87767ee1ffc7).*
+*Впервые опубликовано 13.10.2020 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/51). [Пост на Boosty](https://boosty.to/avkarpov/posts/5f492034-b5b2-4a19-9bc3-87767ee1ffc7).*

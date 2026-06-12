@@ -50,4 +50,4 @@ date: 2020-12-24
 
 ---
 
-*Впервые опубликовано 24.12.2020 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/59e9422d-f94e-4878-a4f9-33ab369f618c).*
+*Впервые опубликовано 24.12.2020 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/72). [Пост на Boosty](https://boosty.to/avkarpov/posts/59e9422d-f94e-4878-a4f9-33ab369f618c).*

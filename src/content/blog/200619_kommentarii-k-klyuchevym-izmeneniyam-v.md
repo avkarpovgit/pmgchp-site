@@ -114,4 +114,4 @@ date: 2020-06-19
 
 ---
 
-*Впервые опубликовано 19.06.2020 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/b4d6ffe8-daff-43b2-96f7-28dce968a2a6).*
+*Впервые опубликовано 19.06.2020 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/21). [Пост на Boosty](https://boosty.to/avkarpov/posts/b4d6ffe8-daff-43b2-96f7-28dce968a2a6).*

@@ -54,4 +54,4 @@ date: 2022-09-28
 
 ---
 
-*Впервые опубликовано 28.09.2022 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/23e395d2-1337-485d-88ab-ce1efb80a3ec).*
+*Впервые опубликовано 28.09.2022 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/158). [Пост на Boosty](https://boosty.to/avkarpov/posts/23e395d2-1337-485d-88ab-ce1efb80a3ec).*

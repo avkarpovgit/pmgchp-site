@@ -17,4 +17,4 @@ date: 2022-04-21
 
 ---
 
-*Впервые опубликовано 21.04.2022 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/3a619b06-9089-44b9-a827-e6b30df9c6a0).*
+*Впервые опубликовано 21.04.2022 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/126). [Пост на Boosty](https://boosty.to/avkarpov/posts/3a619b06-9089-44b9-a827-e6b30df9c6a0).*

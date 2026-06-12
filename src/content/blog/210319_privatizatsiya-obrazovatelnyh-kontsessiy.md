@@ -37,4 +37,4 @@ date: 2021-03-19
 
 ---
 
-*Впервые опубликовано 19.03.2021 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp). [Пост на Boosty](https://boosty.to/avkarpov/posts/a9a3c769-d53d-4311-987d-059c4b2d9d43).*
+*Впервые опубликовано 19.03.2021 в канале [«Правовой мониторинг ГЧП»](https://t.me/pmgchp/87). [Пост на Boosty](https://boosty.to/avkarpov/posts/a9a3c769-d53d-4311-987d-059c4b2d9d43).*
