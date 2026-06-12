@@ -63,21 +63,27 @@
         document.body.appendChild(bar);
       })();
 
-      // Свайп влево/вправо между разделами на мобильных
+      // Свайп влево/вправо между разделами: тач на мобильных, трекпад на десктопе
       (function () {
-        if (!('ontouchstart' in window) || !window.matchMedia('(max-width: 768px)').matches) return;
         var sections = ['/', '/monitoring/', '/blog/', '/experience/', '/search/'];
         var path = location.pathname;
         var current = sections.indexOf(path);
         if (current === -1) {
-          // на странице поста блога считаем текущим разделом «Блог»
+          // на внутренних страницах раздела (пост, выпуск) текущим считаем раздел
           for (var i = sections.length - 1; i > 0; i--) {
             if (path.indexOf(sections[i]) === 0) { current = i; break; }
           }
         }
         if (current === -1) return; // /terms и прочее — без свайпов
 
-        var x0 = null, y0 = null, t0 = 0, skip = false;
+        var navigated = false;
+        function go(dir) {
+          if (navigated) return;
+          var next = dir < 0 ? current + 1 : current - 1;
+          if (next < 0 || next >= sections.length) return;
+          navigated = true;
+          location.href = sections[next];
+        }
 
         function insideHScroll(el) {
           while (el && el !== document.body) {
@@ -87,24 +93,41 @@
           return false;
         }
 
-        document.addEventListener('touchstart', function (e) {
-          var t = e.touches[0];
-          x0 = t.clientX; y0 = t.clientY; t0 = Date.now();
-          skip = insideHScroll(e.target);
-        }, { passive: true });
+        // --- тач-жесты (телефоны и планшеты) ---
+        if ('ontouchstart' in window) {
+          var x0 = null, y0 = null, t0 = 0, skip = false;
+          document.addEventListener('touchstart', function (e) {
+            var t = e.touches[0];
+            x0 = t.clientX; y0 = t.clientY; t0 = Date.now();
+            skip = insideHScroll(e.target);
+          }, { passive: true });
+          document.addEventListener('touchend', function (e) {
+            if (x0 === null || skip) { x0 = null; return; }
+            var t = e.changedTouches[0];
+            var dx = t.clientX - x0, dy = t.clientY - y0, dt = Date.now() - t0;
+            x0 = null;
+            if (dt > 600) return;
+            if (Math.abs(dx) < 70) return;
+            if (Math.abs(dy) > Math.abs(dx) * 0.6) return;
+            go(dx);
+          }, { passive: true });
+        }
 
-        document.addEventListener('touchend', function (e) {
-          if (x0 === null || skip) { x0 = null; return; }
-          var t = e.changedTouches[0];
-          var dx = t.clientX - x0, dy = t.clientY - y0, dt = Date.now() - t0;
-          x0 = null;
-          if (dt > 600) return;                       // слишком медленно — не жест
-          if (Math.abs(dx) < 70) return;              // слишком коротко
-          if (Math.abs(dy) > Math.abs(dx) * 0.6) return; // не горизонтально
-          var next = dx < 0 ? current + 1 : current - 1;
-          if (next < 0 || next >= sections.length) return;
-          location.href = sections[next];
-        }, { passive: true });
+        // --- горизонтальный жест трекпадом (десктоп) ---
+        var acc = 0, accTimer = null;
+        document.addEventListener('wheel', function (e) {
+          if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // вертикальная прокрутка
+          if (insideHScroll(e.target)) return;                  // прокрутка таблицы
+          e.preventDefault(); // глушим системный «назад/вперёд», навигируем сами
+          acc += e.deltaX;
+          clearTimeout(accTimer);
+          accTimer = setTimeout(function () { acc = 0; }, 250);
+          if (Math.abs(acc) > 320) {
+            var dir = acc > 0 ? -1 : 1; // deltaX > 0 — смахивание влево → следующий раздел
+            acc = 0;
+            go(dir);
+          }
+        }, { passive: false });
       })();
     </script> <!-- Яндекс.Метрика --> <script type="text/javascript">
       (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
