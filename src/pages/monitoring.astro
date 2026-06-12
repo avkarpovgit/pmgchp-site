@@ -12,9 +12,6 @@ for (const r of releases as Release[]) {
 }
 const years = [...byYear.keys()].sort((a, b) => b.localeCompare(a));
 
-const formatDate = (d: string) =>
-  new Date(d).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-
 const cleanPeriod = (p: string) => p.replace(/\s*г\.?\s*$/, '').replace(/\s+-\s+/g, ' — ');
 ---
 
@@ -41,7 +38,6 @@ const cleanPeriod = (p: string) => p.replace(/\s*г\.?\s*$/, '').replace(/\s+-\s
             <a href={`https://t.me/pmgchp/${r.id}`} target="_blank" rel="noopener">
               {cleanPeriod(r.period)}
             </a>
-            <span class="release-date">· выпуск от {formatDate(r.date)}</span>
             {r.items.length > 0 && (
               <ul class="release-items">
                 {r.items.map((item) => <li>{item}</li>)}
