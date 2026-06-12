@@ -42,7 +42,9 @@ import Base from '../layouts/Base.astro';
         },
       });
       var input = document.querySelector('#search input');
-      if (input) input.focus();
+      if (input && window.matchMedia('(pointer: fine)').matches && window.innerWidth >= 900) {
+        input.focus();
+      }
     });
   </script>
 

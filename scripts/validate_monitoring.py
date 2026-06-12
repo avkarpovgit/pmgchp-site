@@ -6,9 +6,9 @@
 Запуск: python3 scripts/validate_monitoring.py [--fix]  (--fix удаляет дубли items)
 """
 import json
-import re
 import sys
 import pathlib
+from datetime import date
 
 DATA = pathlib.Path(__file__).parent.parent / "src/data/monitoring.json"
 
@@ -38,10 +38,19 @@ def main():
 
         if not e.get("period", "").strip():
             errors.append(f"id {rid}: пустой period")
-        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", e.get("date", "")):
+        try:
+            date.fromisoformat(e.get("date", ""))
+        except (ValueError, TypeError):
             errors.append(f"id {rid}: некорректная дата {e.get('date')!r}")
 
         items = e.get("items", [])
+        if not isinstance(items, list):
+            errors.append(f"id {rid}: items не список")
+            continue
+        bad = [i for i, it in enumerate(items) if not isinstance(it, str) or not it.strip()]
+        for i in bad:
+            errors.append(f"id {rid}: пустой или некорректный item #{i + 1}")
+        items = [it for it in items if isinstance(it, str)]
         normed = [norm(i) for i in items]
         if len(normed) != len(set(normed)):
             if fix:

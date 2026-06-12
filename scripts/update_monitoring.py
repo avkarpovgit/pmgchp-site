@@ -45,12 +45,18 @@ def main():
     max_id = max(known)
 
     msgs = parse_page(fetch(f"https://t.me/s/{CHANNEL}"))
+    if not msgs:
+        print("ОШИБКА: не распарсено ни одного сообщения — вероятно, изменился HTML t.me/s")
+        return 1
+    skipped_old = skipped_non_monitoring = 0
     new = []
     for mid, dt, text in msgs:
         if mid <= max_id or mid in known:
+            skipped_old += 1
             continue
         first = text.split("\n", 1)[0].strip()
         if not re.match(r"(?i)правовой мониторинг за", first):
+            skipped_non_monitoring += 1
             continue
         period = re.sub(r"(?i)^правовой мониторинг за\s*", "", re.sub(r"\s+", " ", first)).rstrip(".").strip()
         items = []
@@ -68,6 +74,9 @@ def main():
                     items.append(item)
         new.append({"id": mid, "date": dt[:10], "period": period, "items": items})
 
+    print(f"сообщений распарсено: {len(msgs)} | известный max_id: {max_id} | "
+          f"пропущено старых: {skipped_old} | пропущено не-мониторинга: {skipped_non_monitoring} | "
+          f"новых выпусков: {len(new)}")
     if not new:
         print("новых выпусков нет")
         return 0
