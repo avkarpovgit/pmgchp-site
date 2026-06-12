@@ -87,5 +87,38 @@ def main():
     return 0
 
 
+FIXTURE = """
+<div class="tgme_widget_message_wrap js-widget_message_wrap">
+ <div class="tgme_widget_message" data-post="pmgchp/999">
+  <div class="tgme_widget_message_text js-message_text" dir="auto">Правовой мониторинг за 1 - 6 июня 2099 г.<br/><br/>1. Первый пункт обзора<br/>2. Второй пункт обзора<br/>2. Второй пункт обзора<br/>Подготовлено с использованием СПС «Консультант Плюс»<br/>#правовоймониторинг</div>
+  <time datetime="2099-06-08T05:00:00+00:00"></time>
+ </div>
+</div>
+"""
+
+
+def selftest():
+    """Fixture-тест парсера: формат t.me/s и дедупликация items."""
+    msgs = parse_page(FIXTURE)
+    assert len(msgs) == 1, f"ожидалось 1 сообщение, получено {len(msgs)}"
+    mid, dt, text = msgs[0]
+    assert mid == 999 and dt.startswith("2099-06-08"), (mid, dt)
+    first = text.split("\n", 1)[0].strip()
+    assert re.match(r"(?i)правовой мониторинг за", first), f"заголовок не распознан: {first!r}"
+    items, seen = [], set()
+    for ln in text.split("\n")[1:]:
+        mm = re.match(r"^(?:\d+[.)]\s*|[-•▪️]\s*)(.+)$", ln.strip())
+        if mm:
+            item = re.sub(r"\s+", " ", mm.group(1)).strip()
+            if item.lower() not in seen:
+                seen.add(item.lower())
+                items.append(item)
+    assert items == ["Первый пункт обзора", "Второй пункт обзора"], items
+    print("selftest OK: парсинг сообщения и дедупликация работают")
+    return 0
+
+
 if __name__ == "__main__":
+    if "--selftest" in sys.argv:
+        sys.exit(selftest())
     sys.exit(main())
