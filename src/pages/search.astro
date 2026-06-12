@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Поиск — Правовой мониторинг ГЧП" description="Поиск по статьям блога и архиву правового мониторинга ГЧП.">
+  <h1>Поиск</h1>
+  <p style="color: var(--text-muted);">
+    По блогу и архиву мониторинга — например, «МГД», «капитальный грант» или номер закона.
+  </p>
+
+  <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+  <div id="search" class="search-box"></div>
+
+  <script is:inline src="/pagefind/pagefind-ui.js"></script>
+  <script is:inline>
+    window.addEventListener('DOMContentLoaded', function () {
+      if (typeof PagefindUI === 'undefined') {
+        document.getElementById('search').textContent =
+          'Поиск доступен только на опубликованном сайте.';
+        return;
+      }
+      new PagefindUI({
+        element: '#search',
+        showSubResults: true,
+        showImages: false,
+        translations: {
+          placeholder: 'Что ищем?',
+          zero_results: 'Ничего не найдено по запросу «[SEARCH_TERM]»',
+          many_results: '[COUNT] результатов по запросу «[SEARCH_TERM]»',
+          one_result: '[COUNT] результат по запросу «[SEARCH_TERM]»',
+          clear_search: 'Очистить',
+          load_more: 'Показать ещё',
+          searching: 'Ищем «[SEARCH_TERM]»…',
+        },
+      });
+      var input = document.querySelector('#search input');
+      if (input) input.focus();
+    });
+  </script>
+
+  <style is:inline>
+    .search-box {
+      --pagefind-ui-primary: var(--accent-dark);
+      --pagefind-ui-text: var(--text);
+      --pagefind-ui-background: var(--card-bg);
+      --pagefind-ui-border: var(--border);
+      --pagefind-ui-tag: var(--border);
+      --pagefind-ui-border-width: 1px;
+      --pagefind-ui-border-radius: 8px;
+      --pagefind-ui-font: inherit;
+      margin-top: 1.5rem;
+    }
+  </style>
+</Base>

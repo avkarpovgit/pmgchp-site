@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
+import { tagSlug } from '../../utils/tags';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -15,6 +16,21 @@ const { Content } = await render(post);
 
 const formatDate = (d: Date) =>
   d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+
+// похожие посты — по числу общих тегов, затем по близости даты
+const all = await getCollection('blog', ({ data }) => !data.draft);
+const related = all
+  .filter((p) => p.id !== post.id)
+  .map((p) => ({
+    p,
+    shared: p.data.tags.filter((t: string) => post.data.tags.includes(t)).length,
+  }))
+  .filter((x) => x.shared > 0)
+  .sort((a, b) => b.shared - a.shared
+    || Math.abs(a.p.data.date.valueOf() - post.data.date.valueOf())
+     - Math.abs(b.p.data.date.valueOf() - post.data.date.valueOf()))
+  .slice(0, 3)
+  .map((x) => x.p);
 ---
 
 <Base title={`${post.data.title} — Правовой мониторинг ГЧП`} description={post.data.description} ogType="article" publishDate={post.data.date}>
@@ -22,10 +38,32 @@ const formatDate = (d: Date) =>
     <header class="article-header">
       <p class="post-date">{formatDate(post.data.date)}</p>
       <h1>{post.data.title}</h1>
+      {post.data.tags.length > 0 && (
+        <div class="tag-cloud article-tags">
+          {post.data.tags.map((tag: string) => (
+            <a class="tag-chip" href={`/blog/tag/${tagSlug(tag)}/`}>{tag}</a>
+          ))}
+        </div>
+      )}
     </header>
     <div class="prose">
       <Content />
     </div>
   </article>
+
+  {related.length > 0 && (
+    <aside class="related">
+      <h2>Похожие записи</h2>
+      <ul>
+        {related.map((r) => (
+          <li>
+            <a href={`/blog/${r.id}/`}>{r.data.title}</a>
+            <span class="post-date"> · {formatDate(r.data.date)}</span>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  )}
+
   <p style="margin-top: 3rem;"><a href="/blog/">← Все записи</a></p>
 </Base>

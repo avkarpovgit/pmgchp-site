@@ -26,6 +26,7 @@ const navItems = [
   { href: '/experience/', label: 'Опыт' },
   { href: '/blog/', label: 'Блог' },
   { href: '/monitoring/', label: 'Мониторинг' },
+  { href: '/search/', label: 'Поиск' },
 ];
 
 function isCurrent(href: string) {
@@ -58,6 +59,8 @@ const articleLd = ogType === 'article' && publishDate ? {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdfcfa" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#221426" />
     <meta name="description" content={description} />
     <meta name="keywords" content="Александр Карпов, Правовой мониторинг ГЧП, ГЧП, государственно-частное партнёрство, концессии, концессионные соглашения, проектное финансирование, 115-ФЗ, 224-ФЗ, СЗПК, юрист ГЧП" />
     <meta name="author" content="Александр Карпов" />

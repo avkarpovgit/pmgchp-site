@@ -1,0 +1,37 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { TAG_SLUGS, tagSlug } from '../../../utils/tags';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const tags = new Set<string>();
+  posts.forEach((p) => p.data.tags.forEach((t: string) => tags.add(t)));
+  return [...tags].map((tag) => ({
+    params: { slug: tagSlug(tag) },
+    props: { tag },
+  }));
+}
+
+const { tag } = Astro.props;
+const posts = (await getCollection('blog', ({ data }) => !data.draft && data.tags.includes(tag)))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const formatDate = (d: Date) =>
+  d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<Base title={`Тег «${tag}» — блог — Правовой мониторинг ГЧП`} description={`Записи блога по теме «${tag}»: право ГЧП, концессии, проектное финансирование.`}>
+  <h1>Тег «{tag}»</h1>
+  <p style="color: var(--text-muted);">{posts.length} {posts.length === 1 ? 'запись' : posts.length < 5 ? 'записи' : 'записей'} · <a href="/blog/">все записи</a></p>
+
+  <ul class="post-list">
+    {posts.map((post) => (
+      <li>
+        <span class="post-date">{formatDate(post.data.date)}</span>
+        <h3><a href={`/blog/${post.id}/`}>{post.data.title}</a></h3>
+        {post.data.description && <p class="excerpt">{post.data.description}</p>}
+      </li>
+    ))}
+  </ul>
+</Base>

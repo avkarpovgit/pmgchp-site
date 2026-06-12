@@ -1,9 +1,14 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import { tagSlug } from '../../utils/tags';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const tagCounts = new Map<string, number>();
+posts.forEach((p) => p.data.tags.forEach((t: string) => tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1)));
+const allTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
 
 const formatDate = (d: Date) =>
   d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -14,6 +19,12 @@ const formatDate = (d: Date) =>
   <p class="subtitle" style="color: var(--text-muted); margin-top: 0.5rem;">
     Статьи и обзоры о праве ГЧП, концессиях и проектном финансировании.
   </p>
+
+  <div class="tag-cloud">
+    {allTags.map(([tag, count]) => (
+      <a class="tag-chip" href={`/blog/tag/${tagSlug(tag)}/`}>{tag} <span>{count}</span></a>
+    ))}
+  </div>
 
   {posts.length === 0 ? (
     <div class="callout">
