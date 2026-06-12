@@ -23,9 +23,9 @@ const ogImageURL = new URL(ogImage, Astro.site);
 
 const navItems = [
   { href: '/', label: 'Главная' },
-  { href: '/experience/', label: 'Опыт' },
-  { href: '/blog/', label: 'Блог' },
   { href: '/monitoring/', label: 'Мониторинг' },
+  { href: '/blog/', label: 'Блог' },
+  { href: '/experience/', label: 'Опыт' },
   { href: '/search/', label: 'Поиск' },
 ];
 
@@ -187,7 +187,7 @@ const articleLd = ogType === 'article' && publishDate ? {
       // Свайп влево/вправо между разделами на мобильных
       (function () {
         if (!('ontouchstart' in window) || !window.matchMedia('(max-width: 768px)').matches) return;
-        var sections = ['/', '/experience/', '/blog/', '/monitoring/'];
+        var sections = ['/', '/monitoring/', '/blog/', '/experience/', '/search/'];
         var path = location.pathname;
         var current = sections.indexOf(path);
         if (current === -1) {
