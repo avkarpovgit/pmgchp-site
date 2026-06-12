@@ -1,17 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getCollection } from 'astro:content';
-import releases from '../data/monitoring.json';
-
-const postCount = (await getCollection('blog', ({ data }) => !data.draft)).length;
-const releaseCount = releases.length;
-
-function plural(n: number, one: string, few: string, many: string) {
-  const m10 = n % 10, m100 = n % 100;
-  if (m10 === 1 && m100 !== 11) return one;
-  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
-  return many;
-}
 
 const personLd = {
   '@context': 'https://schema.org',
@@ -64,29 +52,22 @@ const siteLd = {
     </p>
   </section>
 
-  <h2>Фокус практики</h2>
-  <ul class="focus-list">
-    <li><strong>Проектное финансирование</strong> — структурирование сделок, кредитная документация, финансовое закрытие, сопровождение выдачи траншей</li>
-    <li><strong>Концессии и ГЧП</strong> — подготовка и изменение соглашений, ЧКИ и конкурсы, сопровождение на всех стадиях проекта</li>
-    <li><strong>Риски участников</strong> — матрицы рисков и рекомендации для публичной стороны, инвесторов и кредиторов</li>
-  </ul>
-
   <h2>На сайте</h2>
   <div class="section-cards">
     <a class="section-card" href="/monitoring/">
       <h3>Мониторинг</h3>
-      <p>Обзоры правовых актов и судебной практики по ГЧП с 2020 года</p>
-      <span class="card-meta">{releaseCount} {plural(releaseCount, 'выпуск', 'выпуска', 'выпусков')} →</span>
+      <p>Обзоры изменений законодательства в сфере ГЧП с 2020 года</p>
+      <span class="card-meta">Все выпуски →</span>
     </a>
     <a class="section-card" href="/blog/">
       <h3>Блог</h3>
-      <p>Статьи и разборы: законопроекты, бюджет, судебные споры, облигации</p>
-      <span class="card-meta">{postCount} {plural(postCount, 'запись', 'записи', 'записей')} →</span>
+      <p>Мои комментарии и мнения по отдельным вопросам</p>
+      <span class="card-meta">Все записи →</span>
     </a>
     <a class="section-card" href="https://t.me/pmgchp" target="_blank" rel="noopener">
       <h3>Telegram-канал</h3>
-      <p>Оперативные комментарии к изменениям законодательства о концессиях и ГЧП</p>
-      <span class="card-meta">900+ подписчиков ↗</span>
+      <p>Мониторинг и комментарии в канале с 900+ подписчиков</p>
+      <span class="card-meta">Подписаться ↗</span>
     </a>
     <a class="section-card" href="/experience/">
       <h3>Опыт</h3>

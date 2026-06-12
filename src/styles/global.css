@@ -292,29 +292,6 @@ main {
 
 .callout p:last-child { margin-bottom: 0; }
 
-/* Focus list + CTA */
-.focus-list {
-  list-style: none;
-  padding-left: 0;
-}
-
-.focus-list li {
-  padding-left: 1.1rem;
-  position: relative;
-  margin-bottom: 0.7rem;
-}
-
-.focus-list li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.55em;
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 2px;
-  background: var(--accent);
-}
-
 /* Карточки разделов на главной */
 .section-cards {
   display: grid;
