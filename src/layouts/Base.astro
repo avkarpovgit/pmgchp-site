@@ -196,6 +196,11 @@ const articleLd = ogType === 'article' && publishDate ? {
           }
         }
         if (current === -1) return; // /terms и прочее — без свайпов
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        function inFormField(el) {
+          return el && el.closest && !!el.closest('input, textarea, select, [contenteditable]');
+        }
 
         var navigated = false;
         function go(dir) {
@@ -220,7 +225,7 @@ const articleLd = ogType === 'article' && publishDate ? {
           document.addEventListener('touchstart', function (e) {
             var t = e.touches[0];
             x0 = t.clientX; y0 = t.clientY; t0 = Date.now();
-            skip = insideHScroll(e.target);
+            skip = insideHScroll(e.target) || inFormField(e.target);
           }, { passive: true });
           document.addEventListener('touchend', function (e) {
             if (x0 === null || skip) { x0 = null; return; }
@@ -240,6 +245,7 @@ const articleLd = ogType === 'article' && publishDate ? {
           if (performance.now() < 800) return;                  // хвост инерции прошлого жеста
           if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // вертикальная прокрутка
           if (insideHScroll(e.target)) return;                  // прокрутка таблицы
+          if (inFormField(e.target)) return;                    // поля ввода
           e.preventDefault(); // глушим системный «назад/вперёд», навигируем сами
           acc += e.deltaX;
           clearTimeout(accTimer);

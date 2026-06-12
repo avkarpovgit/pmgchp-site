@@ -21,6 +21,7 @@ jobs:
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           python3 scripts/update_monitoring.py
+          python3 scripts/validate_monitoring.py
           if ! git diff --quiet src/data/monitoring.json; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -33,6 +34,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
+
+      - name: Валидация данных мониторинга
+        run: python3 scripts/validate_monitoring.py
 
       - run: npm ci
 

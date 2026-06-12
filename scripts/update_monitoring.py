@@ -54,13 +54,18 @@ def main():
             continue
         period = re.sub(r"(?i)^правовой мониторинг за\s*", "", re.sub(r"\s+", " ", first)).rstrip(".").strip()
         items = []
+        seen = set()
         for ln in text.split("\n")[1:]:
             ln = ln.strip()
             if not ln or re.match(r"(?i)(подготовлено с использованием|#|ссылки на документы|в нем ключевые)", ln):
                 continue
             mm = re.match(r"^(?:\d+[.)]\s*|[-•▪️]\s*)(.+)$", ln)
             if mm:
-                items.append(re.sub(r"\s+", " ", mm.group(1)).strip())
+                item = re.sub(r"\s+", " ", mm.group(1)).strip()
+                key = item.lower()
+                if key not in seen:  # дедупликация с сохранением порядка
+                    seen.add(key)
+                    items.append(item)
         new.append({"id": mid, "date": dt[:10], "period": period, "items": items})
 
     if not new:

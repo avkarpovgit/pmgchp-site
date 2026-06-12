@@ -25,8 +25,8 @@ const cleanPeriod = (p: string) => p.replace(/\s*г\.?\s*$/, '').replace(/\s+-\s
 >
   <h1>Правовой мониторинг</h1>
   <p class="subtitle" style="color: var(--text-muted); margin-top: 0.5rem;">
-    Еженедельные обзоры ключевых правовых актов и судебных решений в сфере ГЧП и концессий.
-    Выходят в телеграм-канале <a href="https://t.me/pmgchp" target="_blank" rel="noopener">«Правовой мониторинг ГЧП»</a> с июня 2020 года.
+    Обзоры ключевых правовых актов и судебных решений в сфере ГЧП и концессий.
+    Публикуются в телеграм-канале <a href="https://t.me/pmgchp" target="_blank" rel="noopener">«Правовой мониторинг ГЧП»</a> с июня 2020 года.
   </p>
 
   <nav class="anchor-nav">
@@ -48,9 +48,12 @@ const cleanPeriod = (p: string) => p.replace(/\s*г\.?\s*$/, '').replace(/\s+-\s
               )}
               <a class="release-tg" href={`https://t.me/pmgchp/${r.id}`} target="_blank" rel="noopener" title="Выпуск в Telegram">TG ↗</a>
               {r.items.length > 0 && (
-                <ul class="release-items">
-                  {r.items.map((item) => <li>{item}</li>)}
-                </ul>
+                <details class="release-details">
+                  <summary>Ключевые темы ({r.items.length})</summary>
+                  <ul class="release-items">
+                    {r.items.map((item) => <li>{item}</li>)}
+                  </ul>
+                </details>
               )}
             </li>
           );

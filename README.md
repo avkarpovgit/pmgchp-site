@@ -1,37 +1,66 @@
 # pmgchp.ru
 
-Персональный сайт Александра Карпова — юриста по проектному финансированию и ГЧП.
+Персональный сайт Александра Карпова — юриста по проектному финансированию и ГЧП,
+автора телеграм-канала [«Правовой мониторинг ГЧП»](https://t.me/pmgchp).
 
-Статический сайт на [Astro](https://astro.build). Деплой — GitHub Actions → GitHub Pages, домен `pmgchp.ru`.
+Статический сайт на [Astro](https://astro.build) + поиск [Pagefind](https://pagefind.app).
+Деплой — GitHub Actions → GitHub Pages (ветка `gh-pages`), домен `pmgchp.ru`.
 
 ## Структура
 
-- `src/pages/index.astro` — главная
-- `src/pages/experience.astro` — опыт
-- `src/pages/blog/` — лента блога и шаблон поста
-- `src/content/blog/*.md` — посты блога (Markdown)
-- `public/images/` — фото и логотипы
+- `src/pages/` — страницы: главная, `experience` (опыт), `monitoring` (архив мониторинга),
+  `search` (поиск), `terms` (пользовательское соглашение), `404`
+- `src/content/blog/*.md` — посты блога (Markdown с тегами)
+- `src/content/monitoring/*.md` — полные тексты выпусков мониторинга (slug = дата начала недели)
+- `src/data/monitoring.json` — реестр выпусков для страницы архива (id поста в TG, период, оглавление)
+- `src/layouts/Base.astro` — общий лейаут: SEO-разметка, тёмная тема, свайп-навигация, Метрика
+- `scripts/update_monitoring.py` — автодобавление новых выпусков из веб-версии канала
+- `scripts/validate_monitoring.py` — валидатор данных мониторинга (`--fix` удаляет дубли)
+- `public/files/` — PDF-документы, `public/images/` — фото и логотипы
+
+## Автоматизация (GitHub Actions)
+
+`.github/workflows/deploy.yml`:
+
+- **пуш в `main`** → валидация данных → сборка (`astro build` + Pagefind) → деплой в `gh-pages`;
+- **ежедневно в 05:00 UTC** → `update_monitoring.py` проверяет канал, добавляет новые выпуски
+  «Правовой мониторинг за…» в `monitoring.json` (с дедупликацией пунктов), коммитит и пересобирает сайт.
 
 ## Как добавить пост в блог
 
-Создать файл `src/content/blog/YYMMDD_slug.md`:
+Создать `src/content/blog/YYMMDD_slug.md`:
 
 ```markdown
 ---
-title: Заголовок поста
-description: Короткое описание для ленты и SEO
-date: 2026-06-11
+title: Заголовок
+description: Описание для ленты и SEO
+date: 2026-06-12
+tags: ["концессии"]
 ---
 
-Текст поста в Markdown.
+Текст в Markdown.
 ```
 
-После пуша в `main` сайт пересобирается и публикуется автоматически (~2 минуты).
+## Как добавить выпуск мониторинга вручную
+
+1. Добавить запись в начало `src/data/monitoring.json`: `{"id": <id поста в TG>, "date": "YYYY-MM-DD", "period": "...", "items": [...]}`.
+2. (Опционально) положить полный текст в `src/content/monitoring/<дата-начала>.md`
+   с frontmatter `title`, `period`, `date`, `tgId` — страница появится автоматически,
+   архив сошлётся на неё по `tgId`.
+3. Проверить: `python3 scripts/validate_monitoring.py`.
 
 ## Локальная разработка
 
 ```bash
 npm install
-npm run dev      # http://localhost:4321
-npm run build    # production-сборка в dist/
+npm run dev                              # http://localhost:4321 (поиск работает только после build)
+npm run build                            # сборка + индекс Pagefind в dist/
+python3 scripts/validate_monitoring.py   # проверка данных мониторинга на дубли и дефекты
 ```
+
+## Лицензия
+
+Авторские материалы сайта (тексты постов и выпусков мониторинга) распространяются по лицензии
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru) — подробнее в [LICENSE.md](LICENSE.md)
+и в [пользовательском соглашении](https://pmgchp.ru/terms/). Лицензия не распространяется на тексты
+нормативных актов и иных официальных документов.
