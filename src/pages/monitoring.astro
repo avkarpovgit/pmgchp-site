@@ -1,8 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
 import releases from '../data/monitoring.json';
 
 type Release = { id: number; date: string; period: string; items: string[] };
+
+const pages = await getCollection('monitoring');
+const pageByTgId = new Map<number, string>(pages.map((p) => [p.data.tgId, p.id]));
 
 const byYear = new Map<string, Release[]>();
 for (const r of releases as Release[]) {
@@ -33,18 +37,24 @@ const cleanPeriod = (p: string) => p.replace(/\s*г\.?\s*$/, '').replace(/\s+-\s
     <section>
       <h2 id={`y${year}`}>{year}</h2>
       <ul class="monitoring-list">
-        {byYear.get(year)!.map((r) => (
-          <li>
-            <a href={`https://t.me/pmgchp/${r.id}`} target="_blank" rel="noopener">
-              {cleanPeriod(r.period)}
-            </a>
-            {r.items.length > 0 && (
-              <ul class="release-items">
-                {r.items.map((item) => <li>{item}</li>)}
-              </ul>
-            )}
-          </li>
-        ))}
+        {byYear.get(year)!.map((r) => {
+          const slug = pageByTgId.get(r.id);
+          return (
+            <li>
+              {slug ? (
+                <a href={`/monitoring/${slug}/`}>{cleanPeriod(r.period)}</a>
+              ) : (
+                <a href={`https://t.me/pmgchp/${r.id}`} target="_blank" rel="noopener">{cleanPeriod(r.period)}</a>
+              )}
+              <a class="release-tg" href={`https://t.me/pmgchp/${r.id}`} target="_blank" rel="noopener" title="Выпуск в Telegram">TG ↗</a>
+              {r.items.length > 0 && (
+                <ul class="release-items">
+                  {r.items.map((item) => <li>{item}</li>)}
+                </ul>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </section>
   ))}

@@ -465,6 +465,19 @@ main {
   margin-left: 0.4rem;
 }
 
+.release-tg {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  margin-left: 0.55rem;
+  border-bottom: none;
+  opacity: 0.7;
+}
+
+.release-tg:hover {
+  color: var(--accent-dark);
+  opacity: 1;
+}
+
 .release-items {
   margin: 0.5rem 0 0.3rem;
   padding-left: 1.3rem;
