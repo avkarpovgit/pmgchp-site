@@ -297,6 +297,34 @@ main {
   font-size: 0.95rem;
 }
 
+/* Monitoring archive */
+.monitoring-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.monitoring-list > li {
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.monitoring-list .release-date {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin-left: 0.4rem;
+}
+
+.release-items {
+  margin: 0.5rem 0 0.3rem;
+  padding-left: 1.3rem;
+  font-size: 0.93rem;
+  color: var(--text-muted);
+}
+
+.release-items li {
+  margin-bottom: 0.25rem;
+}
+
 /* Article (blog post) */
 .article-header { margin-bottom: 2rem; }
 

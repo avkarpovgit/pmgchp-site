@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import releases from '../data/monitoring.json';
+
+type Release = { id: number; date: string; period: string; items: string[] };
+
+const byYear = new Map<string, Release[]>();
+for (const r of releases as Release[]) {
+  const year = r.date.slice(0, 4);
+  if (!byYear.has(year)) byYear.set(year, []);
+  byYear.get(year)!.push(r);
+}
+const years = [...byYear.keys()].sort((a, b) => b.localeCompare(a));
+
+const formatDate = (d: string) =>
+  new Date(d).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+
+const cleanPeriod = (p: string) => p.replace(/\s*г\.?\s*$/, '').replace(/\s+-\s+/g, ' — ');
+---
+
+<Base
+  title="Еженедельный правовой мониторинг ГЧП — архив выпусков"
+  description="Архив еженедельного правового мониторинга ГЧП: ключевые нормативные акты и судебная практика по концессиям и государственно-частному партнёрству с 2020 года."
+>
+  <h1>Правовой мониторинг</h1>
+  <p class="subtitle" style="color: var(--text-muted); margin-top: 0.5rem;">
+    Еженедельные обзоры ключевых правовых актов и судебных решений в сфере ГЧП и концессий.
+    Выходят в телеграм-канале <a href="https://t.me/pmgchp" target="_blank" rel="noopener">«Правовой мониторинг ГЧП»</a> с июня 2020 года.
+  </p>
+
+  <nav class="anchor-nav">
+    {years.map((y) => <a href={`#y${y}`}>{y}</a>)}
+  </nav>
+
+  {years.map((year) => (
+    <section>
+      <h2 id={`y${year}`}>{year}</h2>
+      <ul class="monitoring-list">
+        {byYear.get(year)!.map((r) => (
+          <li>
+            <a href={`https://t.me/pmgchp/${r.id}`} target="_blank" rel="noopener">
+              {cleanPeriod(r.period)}
+            </a>
+            <span class="release-date">· выпуск от {formatDate(r.date)}</span>
+            {r.items.length > 0 && (
+              <ul class="release-items">
+                {r.items.map((item) => <li>{item}</li>)}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</Base>
