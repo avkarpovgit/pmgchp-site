@@ -62,9 +62,8 @@
         } catch (e) { return; }
         var bar = document.createElement('div');
         bar.className = 'cookie-notice';
-        bar.innerHTML = 'Сайт использует cookie для сбора статистики посещаемости (Яндекс.Метрика). ' +
-          'Продолжая пользоваться сайтом, вы соглашаетесь с ' +
-          '<a href="/terms/">пользовательским соглашением</a>. ' +
+        bar.innerHTML = 'На сайте используется Яндекс.Метрика для статистики посещаемости (cookie). ' +
+          'Подробнее — в <a href="/terms/">пользовательском соглашении</a>. ' +
           '<button type="button">Понятно</button>';
         bar.querySelector('button').addEventListener('click', function () {
           try { localStorage.setItem('cookieAck', '1'); } catch (e) {}

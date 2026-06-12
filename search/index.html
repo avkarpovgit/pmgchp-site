@@ -37,7 +37,9 @@
         },
       });
       var input = document.querySelector('#search input');
-      if (input) input.focus();
+      if (input && window.matchMedia('(pointer: fine)').matches && window.innerWidth >= 900) {
+        input.focus();
+      }
     });
   </script> <style>
     .search-box {
@@ -92,9 +94,8 @@
         } catch (e) { return; }
         var bar = document.createElement('div');
         bar.className = 'cookie-notice';
-        bar.innerHTML = 'Сайт использует cookie для сбора статистики посещаемости (Яндекс.Метрика). ' +
-          'Продолжая пользоваться сайтом, вы соглашаетесь с ' +
-          '<a href="/terms/">пользовательским соглашением</a>. ' +
+        bar.innerHTML = 'На сайте используется Яндекс.Метрика для статистики посещаемости (cookie). ' +
+          'Подробнее — в <a href="/terms/">пользовательском соглашении</a>. ' +
           '<button type="button">Понятно</button>';
         bar.querySelector('button').addEventListener('click', function () {
           try { localStorage.setItem('cookieAck', '1'); } catch (e) {}
