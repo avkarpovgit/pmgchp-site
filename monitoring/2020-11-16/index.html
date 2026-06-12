@@ -212,6 +212,7 @@
         // --- горизонтальный жест трекпадом (десктоп) ---
         var acc = 0, accTimer = null;
         document.addEventListener('wheel', function (e) {
+          if (performance.now() < 800) return;                  // хвост инерции прошлого жеста
           if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // вертикальная прокрутка
           if (insideHScroll(e.target)) return;                  // прокрутка таблицы
           e.preventDefault(); // глушим системный «назад/вперёд», навигируем сами
