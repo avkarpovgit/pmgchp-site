@@ -90,7 +90,10 @@ const articleLd = ogType === 'article' && publishDate ? {
   <body>
     <header class="site-header">
       <div class="container">
-        <a href="/" class="site-title">Правовой мониторинг ГЧП</a>
+        <a href="/" class="site-title">
+          <img src="/images/logo-pmgchp.png" alt="" class="site-logo" width="28" height="28" />
+          Правовой мониторинг ГЧП
+        </a>
         <nav class="site-nav">
           {navItems.map((item) => (
             <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>

@@ -87,11 +87,21 @@ li { margin-bottom: 0.45rem; }
 }
 
 .site-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   font-family: var(--font-serif);
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--text);
   border-bottom: none;
+}
+
+.site-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  flex-shrink: 0;
 }
 
 .site-title:hover { color: var(--accent-dark); }
