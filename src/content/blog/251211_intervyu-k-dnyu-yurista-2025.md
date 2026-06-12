@@ -18,7 +18,25 @@ tags: ["интервью"]
 
 📄 [Скачать интервью в PDF (3,7 МБ)](/files/intervyu-den-yurista-2025.pdf) · [PDF в Telegram](https://t.me/pmgchp/309)
 
-## Человек, который нашёл призвание
+<details class="pdf-pages" open>
+<summary>📖 Журнальная версия (10 страниц)</summary>
+
+<img src="/images/intervyu/page-01.jpg" alt="Интервью, страница 1" loading="lazy" width="1075" height="1521" />
+<img src="/images/intervyu/page-02.jpg" alt="Интервью, страница 2" loading="lazy" width="1075" height="1521" />
+<img src="/images/intervyu/page-03.jpg" alt="Интервью, страница 3" loading="lazy" width="1075" height="1521" />
+<img src="/images/intervyu/page-04.jpg" alt="Интервью, страница 4" loading="lazy" width="1075" height="1521" />
+<img src="/images/intervyu/page-05.jpg" alt="Интервью, страница 5" loading="lazy" width="1075" height="1521" />
+<img src="/images/intervyu/page-06.jpg" alt="Интервью, страница 6" loading="lazy" width="1075" height="1521" />
+<img src="/images/intervyu/page-07.jpg" alt="Интервью, страница 7" loading="lazy" width="1075" height="1521" />
+<img src="/images/intervyu/page-08.jpg" alt="Интервью, страница 8" loading="lazy" width="1075" height="1521" />
+<img src="/images/intervyu/page-09.jpg" alt="Интервью, страница 9" loading="lazy" width="1075" height="1521" />
+<img src="/images/intervyu/page-10.jpg" alt="Интервью, страница 10" loading="lazy" width="1075" height="1521" />
+
+</details>
+
+## Текстовая версия
+
+### Человек, который нашёл призвание
 
 *«Баланс — это то, за что я отвечаю в своей жизни» — именно так Александр Карпов формулирует свой главный жизненный принцип. Баланс между логикой и человечностью, работой и творчеством, ответственностью и живым интересом. Александр — директор по юридическим вопросам юридического департамента банка, преподаватель юриспруденции в топовом вузе России и автор популярного Telegram-канала о праве. Мы поговорили с Александром о выборе пути, о том самом балансе, о преподавании как творчестве и о том, почему юриспруденция — это не просто работа, а ответственность за судьбы людей.*
 

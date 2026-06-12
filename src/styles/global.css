@@ -572,6 +572,27 @@ main {
   font-weight: 600;
 }
 
+/* Просмотр PDF-страниц в посте */
+.pdf-pages {
+  margin: 1.5rem 0;
+}
+
+.pdf-pages summary {
+  cursor: pointer;
+  color: var(--accent-dark);
+  font-weight: 600;
+  user-select: none;
+  margin-bottom: 0.8rem;
+}
+
+.pdf-pages img {
+  display: block;
+  margin: 0.6rem 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
 .prose blockquote {
   border-left: 3px solid var(--accent);
   padding-left: 1.1rem;
