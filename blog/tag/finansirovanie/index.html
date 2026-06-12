@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="ru"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdfcfa"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#221426"><meta name="description" content="Записи блога по теме «финансирование»: право ГЧП, концессии, проектное финансирование."><meta name="keywords" content="Александр Карпов, Правовой мониторинг ГЧП, ГЧП, государственно-частное партнёрство, концессии, концессионные соглашения, проектное финансирование, 115-ФЗ, 224-ФЗ, СЗПК, юрист ГЧП"><meta name="author" content="Александр Карпов"><meta name="google-site-verification" content="DPQx7Y-gzJYkhpnbh3GO2rWTOWgFcq3uXSOU5AvvPF4"><meta name="yandex-verification" content="e6aa673dd3a0029c"><link rel="canonical" href="https://pmgchp.ru/blog/tag/finansirovanie/"><link rel="icon" href="/favicon.png" type="image/png"><link rel="alternate" type="application/rss+xml" title="Правовой мониторинг ГЧП — блог" href="/rss.xml"><link rel="sitemap" href="/sitemap-index.xml"><meta property="og:type" content="website"><meta property="og:title" content="Тег «финансирование» — блог — Правовой мониторинг ГЧП"><meta property="og:description" content="Записи блога по теме «финансирование»: право ГЧП, концессии, проектное финансирование."><meta property="og:url" content="https://pmgchp.ru/blog/tag/finansirovanie/"><meta property="og:image" content="https://pmgchp.ru/images/og-default.jpg"><meta property="og:locale" content="ru_RU"><meta property="og:site_name" content="Правовой мониторинг ГЧП"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Тег «финансирование» — блог — Правовой мониторинг ГЧП"><meta name="twitter:description" content="Записи блога по теме «финансирование»: право ГЧП, концессии, проектное финансирование."><meta name="twitter:image" content="https://pmgchp.ru/images/og-default.jpg"><title>Тег «финансирование» — блог — Правовой мониторинг ГЧП</title><link rel="stylesheet" href="/_astro/Base.BsKGWvpJ.css"></head> <body> <header class="site-header"> <div class="container"> <a href="/" class="site-title"> <img src="/images/logo-pmgchp.png" alt="" class="site-logo" width="28" height="28">
+Правовой мониторинг ГЧП
+</a> <nav class="site-nav"> <a href="/">Главная</a><a href="/experience/">Опыт</a><a href="/blog/" aria-current="page">Блог</a><a href="/monitoring/">Мониторинг</a><a href="/search/">Поиск</a> <a href="https://t.me/pmgchp" target="_blank" rel="noopener">Telegram&nbsp;↗</a> </nav> </div> </header> <main> <div class="container">  <h1>Тег «финансирование»</h1> <p style="color: var(--text-muted);">1 запись · <a href="/blog/">все записи</a></p> <ul class="post-list"> <li> <span class="post-date">21 апреля 2022 г.</span> <h3><a href="/blog/220421_lgotnoe-rezervirovanie-rasshirilos-na-szpk/">🟩 Льготное резервирование расширилось на СЗПК</a></h3> <p class="excerpt">С завтрашнего дня вступают в силу изменения в Положение ЦБ № 590-П, которое определяет порядок формирования банками резервов на возможные потери по ссудам.</p> </li> </ul>  </div> </main> <footer class="site-footer"> <div class="container"> <span>© 2026 Александр Карпов</span> <span> <a href="https://t.me/pmgchp" target="_blank" rel="noopener">Telegram</a> ·
+<a href="https://boosty.to/avkarpov" target="_blank" rel="noopener">Boosty</a> ·
+<a href="mailto:pmgchp@gmail.com">pmgchp@gmail.com</a> </span> </div> <div class="container footer-legal"> <span>
+Материалы сайта — <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> ·
+<a href="/terms/">Пользовательское соглашение</a> ·
+<a href="/rss.xml">RSS</a> </span> </div> </footer> <script>
+      // Свайп влево/вправо между разделами на мобильных
+      (function () {
+        if (!('ontouchstart' in window) || !window.matchMedia('(max-width: 768px)').matches) return;
+        var sections = ['/', '/experience/', '/blog/', '/monitoring/'];
+        var path = location.pathname;
+        var current = sections.indexOf(path);
+        if (current === -1) {
+          // на странице поста блога считаем текущим разделом «Блог»
+          for (var i = sections.length - 1; i > 0; i--) {
+            if (path.indexOf(sections[i]) === 0) { current = i; break; }
+          }
+        }
+        if (current === -1) return; // /terms и прочее — без свайпов
+
+        var x0 = null, y0 = null, t0 = 0, skip = false;
+
+        function insideHScroll(el) {
+          while (el && el !== document.body) {
+            if (el.scrollWidth > el.clientWidth + 5) return true;
+            el = el.parentElement;
+          }
+          return false;
+        }
+
+        document.addEventListener('touchstart', function (e) {
+          var t = e.touches[0];
+          x0 = t.clientX; y0 = t.clientY; t0 = Date.now();
+          skip = insideHScroll(e.target);
+        }, { passive: true });
+
+        document.addEventListener('touchend', function (e) {
+          if (x0 === null || skip) { x0 = null; return; }
+          var t = e.changedTouches[0];
+          var dx = t.clientX - x0, dy = t.clientY - y0, dt = Date.now() - t0;
+          x0 = null;
+          if (dt > 600) return;                       // слишком медленно — не жест
+          if (Math.abs(dx) < 70) return;              // слишком коротко
+          if (Math.abs(dy) > Math.abs(dx) * 0.6) return; // не горизонтально
+          var next = dx < 0 ? current + 1 : current - 1;
+          if (next < 0 || next >= sections.length) return;
+          location.href = sections[next];
+        }, { passive: true });
+      })();
+    </script> </body> </html>
