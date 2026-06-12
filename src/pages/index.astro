@@ -1,5 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import releases from '../data/monitoring.json';
+
+const postCount = (await getCollection('blog', ({ data }) => !data.draft)).length;
+const releaseCount = releases.length;
+
+function plural(n: number, one: string, few: string, many: string) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
+}
 
 const personLd = {
   '@context': 'https://schema.org',
@@ -43,35 +55,14 @@ const siteLd = {
     </div>
 
     <p>
-      Специализируюсь на структурировании и сопровождении сделок проектного финансирования
-      и&nbsp;ГЧП. Работал в крупных федеральных проектах на стороне разных участников:
-      государственного партнёра, консультанта, инвестора-строителя
-      и&nbsp;финансирующей организации.
-    </p>
-
-    <p>
-      С 2018 года преподаю авторский курс
+      Более 12 лет структурирую и сопровождаю сделки проектного финансирования и&nbsp;ГЧП —
+      работал в крупных федеральных проектах на стороне государственного партнёра, консультанта,
+      инвестора-строителя и&nbsp;финансирующей организации. С 2018 года преподаю авторский курс
       <a href="https://www.hse.ru/ma/interlaw/courses/838247647.html" target="_blank" rel="noopener">«Управление рисками в&nbsp;инвестиционных сделках»</a>
-      на факультете права НИУ&nbsp;ВШЭ. Член Экспертного совета
-      <a href="https://asiic.ru" target="_blank" rel="noopener">Ассоциации инфраструктурных инвесторов и&nbsp;кредиторов (АИИК)</a>.
+      на факультете права НИУ&nbsp;ВШЭ, член Экспертного совета
+      <a href="https://asiic.ru" target="_blank" rel="noopener">АИИК</a>.
     </p>
   </section>
-
-  <div class="callout callout-channel">
-    <img class="channel-logo" src="/images/logo-pmgchp.png" alt="Логотип канала «Правовой мониторинг ГЧП»" width="84" height="84" />
-    <div>
-      <p>
-        Веду телеграм-канал <a href="https://t.me/pmgchp" target="_blank" rel="noopener"><strong>«Правовой мониторинг ГЧП»</strong></a> —
-        комментарии по проблемным вопросам и периодические обзоры изменений законодательства
-        о концессиях и ГЧП. Более 900 подписчиков.
-      </p>
-      <p>
-        Развёрнутые материалы публикую в <a href="https://t.me/pmgchp" target="_blank" rel="noopener">канале</a>,
-        в <a href="/blog/">блоге</a> и на
-        <a href="https://boosty.to/avkarpov" target="_blank" rel="noopener">Boosty</a>.
-      </p>
-    </div>
-  </div>
 
   <h2>Фокус практики</h2>
   <ul class="focus-list">
@@ -80,16 +71,33 @@ const siteLd = {
     <li><strong>Риски участников</strong> — матрицы рисков и рекомендации для публичной стороны, инвесторов и кредиторов</li>
   </ul>
 
-  <div class="cta-row">
-    <a class="cta-btn cta-primary" href="mailto:pmgchp@gmail.com">Написать по проекту</a>
-    <a class="cta-btn" href="/monitoring/">Читать мониторинг</a>
-    <a class="cta-btn" href="https://t.me/pmgchp" target="_blank" rel="noopener">Подписаться в Telegram</a>
+  <h2>На сайте</h2>
+  <div class="section-cards">
+    <a class="section-card" href="/monitoring/">
+      <h3>Мониторинг</h3>
+      <p>Обзоры правовых актов и судебной практики по ГЧП с 2020 года</p>
+      <span class="card-meta">{releaseCount} {plural(releaseCount, 'выпуск', 'выпуска', 'выпусков')} →</span>
+    </a>
+    <a class="section-card" href="/blog/">
+      <h3>Блог</h3>
+      <p>Статьи и разборы: законопроекты, бюджет, судебные споры, облигации</p>
+      <span class="card-meta">{postCount} {plural(postCount, 'запись', 'записи', 'записей')} →</span>
+    </a>
+    <a class="section-card" href="https://t.me/pmgchp" target="_blank" rel="noopener">
+      <h3>Telegram-канал</h3>
+      <p>Оперативные комментарии к изменениям законодательства о концессиях и ГЧП</p>
+      <span class="card-meta">900+ подписчиков ↗</span>
+    </a>
+    <a class="section-card" href="/experience/">
+      <h3>Опыт</h3>
+      <p>Карьера, преподавание, публикации и профессиональные сообщества</p>
+      <span class="card-meta">Подробнее →</span>
+    </a>
   </div>
 
   <h2>Контакты</h2>
   <ul class="contact-list">
     <li><span class="label">Email</span> <a href="mailto:pmgchp@gmail.com">pmgchp@gmail.com</a></li>
-    <li><span class="label">Telegram</span> <a href="https://t.me/pmgchp" target="_blank" rel="noopener">t.me/pmgchp</a></li>
     <li><span class="label">LinkedIn</span> <a href="https://www.linkedin.com/in/karpovav" target="_blank" rel="noopener">linkedin.com/in/karpovav</a></li>
   </ul>
 </Base>

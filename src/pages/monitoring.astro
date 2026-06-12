@@ -49,7 +49,7 @@ const cleanPeriod = (p: string) => p.replace(/\s*г\.?\s*$/, '').replace(/\s+-\s
               <a class="release-tg" href={`https://t.me/pmgchp/${r.id}`} target="_blank" rel="noopener" title="Выпуск в Telegram">TG ↗</a>
               {r.items.length > 0 && (
                 <details class="release-details">
-                  <summary>Ключевые темы ({r.items.length})</summary>
+                  <summary>Содержание ({r.items.length})</summary>
                   <ul class="release-items">
                     {r.items.map((item) => <li>{item}</li>)}
                   </ul>
