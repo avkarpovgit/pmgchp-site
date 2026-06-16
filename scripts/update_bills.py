@@ -72,7 +72,13 @@ def fetch(number):
         "User-Agent": "Mozilla/5.0 (compatible; pmgchp-site/1.0)",
         "Accept-Language": "ru",
     })
-    return _opener().open(req, timeout=60).read().decode("utf-8", "replace")
+    last = None
+    for _ in range(2):  # повтор на случай разовой медлительности тяжёлой страницы
+        try:
+            return _opener().open(req, timeout=120).read().decode("utf-8", "replace")
+        except Exception as e:
+            last = e
+    raise last
 
 
 def to_text(page_html):
