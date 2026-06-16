@@ -9,6 +9,7 @@ type Release = { id: number; date: string; period: string; items: string[] };
 const pages = await getCollection('monitoring');
 const byTgId = new Map<number, string>();
 for (const p of pages) if (p.data.tgId != null) byTgId.set(p.data.tgId, p.id);
+const releaseIds = new Set((releases as Release[]).map((r) => r.id));
 
 // --- Единый список выпусков: Telegram-лента + выпуски, добавленные вручную ---
 type Entry = { date: string; period: string; items: string[]; slug?: string; tgId?: number };
@@ -17,10 +18,13 @@ for (const r of releases as Release[]) {
   entries.push({ date: r.date, period: r.period, items: r.items, slug: byTgId.get(r.id), tgId: r.id });
 }
 for (const p of pages) {
-  if (p.data.tgId != null) continue; // уже учтён через Telegram-ленту
+  // выпуск уже учтён через Telegram-ленту (monitoring.json) — пропускаем
+  if (p.data.tgId != null && releaseIds.has(p.data.tgId)) continue;
+  // иначе — это страница-выпуск, которой нет в monitoring.json: добавленная вручную
+  // (возможно, уже с пост-id из Telegram, пока авто-апдейтер её не подхватил)
   const body = p.body ?? '';
   const items = [...body.matchAll(/^###\s+(.+?)\s*$/gm)].map((m) => m[1].trim());
-  entries.push({ date: p.data.date.toISOString().slice(0, 10), period: p.data.period, items, slug: p.id });
+  entries.push({ date: p.data.date.toISOString().slice(0, 10), period: p.data.period, items, slug: p.id, tgId: p.data.tgId ?? undefined });
 }
 
 const byYear = new Map<string, Entry[]>();
