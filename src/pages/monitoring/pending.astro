@@ -1,0 +1,33 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getPendingActs } from '../../utils/monitoring';
+
+const pending = await getPendingActs();
+---
+
+<Base
+  title="Акты, ожидающие вступления в силу — Правовой мониторинг ГЧП"
+  description="Принятые нормативные акты из правового мониторинга ГЧП, срок вступления в силу которых ещё не наступил. Сортировка по дате вступления в силу."
+>
+  <h1>Акты, ожидающие вступления в силу</h1>
+  <p class="subtitle" style="color: var(--text-muted); margin-top: 0.5rem;">
+    Принятые акты, упомянутые в выпусках мониторинга, срок вступления в силу которых ещё не наступил.
+    Список формируется автоматически по всем выпускам; сортировка — по дате вступления в силу.
+  </p>
+
+  {pending.length === 0 ? (
+    <div class="callout"><p>Сейчас все упомянутые в мониторинге акты уже вступили в силу.</p></div>
+  ) : (
+    <ul class="pending-list">
+      {pending.map((a) => (
+        <li class="pending-item">
+          <span class="pending-date">с {a.dateLabel}</span>
+          <a href={a.url} target="_blank" rel="noopener">{a.title}</a>
+          <span class="pending-src">из выпуска <a href={`/monitoring/${a.slug}/`}>{a.period}</a></span>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  <p style="margin-top: 3rem;"><a href="/monitoring/">← Назад к мониторингу</a></p>
+</Base>

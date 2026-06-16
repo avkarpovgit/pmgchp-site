@@ -2,21 +2,42 @@
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import releases from '../data/monitoring.json';
+import { cleanPeriod, getPendingActs, plural } from '../utils/monitoring';
 
 type Release = { id: number; date: string; period: string; items: string[] };
 
 const pages = await getCollection('monitoring');
-const pageByTgId = new Map<number, string>(pages.map((p) => [p.data.tgId, p.id]));
+const byTgId = new Map<number, string>();
+for (const p of pages) if (p.data.tgId != null) byTgId.set(p.data.tgId, p.id);
 
-const byYear = new Map<string, Release[]>();
+// --- Единый список выпусков: Telegram-лента + выпуски, добавленные вручную ---
+type Entry = { date: string; period: string; items: string[]; slug?: string; tgId?: number };
+const entries: Entry[] = [];
 for (const r of releases as Release[]) {
-  const year = r.date.slice(0, 4);
+  entries.push({ date: r.date, period: r.period, items: r.items, slug: byTgId.get(r.id), tgId: r.id });
+}
+for (const p of pages) {
+  if (p.data.tgId != null) continue; // уже учтён через Telegram-ленту
+  const body = p.body ?? '';
+  const items = [...body.matchAll(/^###\s+(.+?)\s*$/gm)].map((m) => m[1].trim());
+  entries.push({ date: p.data.date.toISOString().slice(0, 10), period: p.data.period, items, slug: p.id });
+}
+
+const byYear = new Map<string, Entry[]>();
+for (const e of entries) {
+  const year = e.date.slice(0, 4);
   if (!byYear.has(year)) byYear.set(year, []);
-  byYear.get(year)!.push(r);
+  byYear.get(year)!.push(e);
+}
+for (const arr of byYear.values()) {
+  arr.sort((a, b) => b.date.localeCompare(a.date) || (b.tgId ?? 0) - (a.tgId ?? 0));
 }
 const years = [...byYear.keys()].sort((a, b) => b.localeCompare(a));
+const currentYear = years[0];
 
-const cleanPeriod = (p: string) => p.replace(/\s*г\.?\s*$/, '').replace(/\s+-\s+/g, ' — ');
+// Счётчики для тизеров «что мы отслеживаем»
+const billsCount = (await getCollection('bills', ({ data }) => !data.draft)).length;
+const pendingCount = (await getPendingActs()).length;
 ---
 
 <Base
@@ -29,24 +50,44 @@ const cleanPeriod = (p: string) => p.replace(/\s*г\.?\s*$/, '').replace(/\s+-\s
     Публикуются в телеграм-канале <a href="https://t.me/pmgchp" target="_blank" rel="noopener">«Правовой мониторинг ГЧП»</a> с июня 2020 года.
   </p>
 
+  <div class="watch-teasers">
+    <a class="watch-teaser" href="/monitoring/bills/">
+      <span class="watch-teaser-label">Отслеживаем законопроекты</span>
+      <span class="watch-teaser-count">
+        {billsCount}&nbsp;{plural(billsCount, ['проект', 'проекта', 'проектов'])} на рассмотрении&nbsp;→
+      </span>
+    </a>
+    <a class="watch-teaser" href="/monitoring/pending/">
+      <span class="watch-teaser-label">Акты, ожидающие вступления в силу</span>
+      <span class="watch-teaser-count">
+        {pendingCount}&nbsp;{plural(pendingCount, ['акт', 'акта', 'актов'])} ещё не в силе&nbsp;→
+      </span>
+    </a>
+  </div>
+
   <nav class="anchor-nav">
     {years.map((y) => <a href={`#y${y}`}>{y}</a>)}
   </nav>
 
-  {years.map((year) => (
-    <section>
-      <h2 id={`y${year}`}>{year}</h2>
-      <ul class="monitoring-list">
-        {byYear.get(year)!.map((r) => {
-          const slug = pageByTgId.get(r.id);
-          return (
+  {years.map((year) => {
+    const list = byYear.get(year)!;
+    return (
+      <details class="year-block" id={`y${year}`} open={year === currentYear}>
+        <summary>
+          <h2 class="year-heading">{year}</h2>
+          <span class="year-count">{list.length}&nbsp;{plural(list.length, ['выпуск', 'выпуска', 'выпусков'])}</span>
+        </summary>
+        <ul class="monitoring-list">
+          {list.map((r) => (
             <li>
-              {slug ? (
-                <a href={`/monitoring/${slug}/`}>{cleanPeriod(r.period)}</a>
+              {r.slug ? (
+                <a href={`/monitoring/${r.slug}/`}>{cleanPeriod(r.period)}</a>
               ) : (
-                <a href={`https://t.me/pmgchp/${r.id}`} target="_blank" rel="noopener">{cleanPeriod(r.period)}</a>
+                <a href={`https://t.me/pmgchp/${r.tgId}`} target="_blank" rel="noopener">{cleanPeriod(r.period)}</a>
               )}
-              <a class="release-tg" href={`https://t.me/pmgchp/${r.id}`} target="_blank" rel="noopener" title="Выпуск в Telegram">TG ↗</a>
+              {r.tgId != null && (
+                <a class="release-tg" href={`https://t.me/pmgchp/${r.tgId}`} target="_blank" rel="noopener" title="Выпуск в Telegram">TG ↗</a>
+              )}
               {r.items.length > 0 && (
                 <details class="release-details">
                   <summary>Содержание ({r.items.length})</summary>
@@ -56,9 +97,29 @@ const cleanPeriod = (p: string) => p.replace(/\s*г\.?\s*$/, '').replace(/\s+-\s
                 </details>
               )}
             </li>
-          );
-        })}
-      </ul>
-    </section>
-  ))}
+          ))}
+        </ul>
+      </details>
+    );
+  })}
+
+  <script is:inline>
+    // Якоря в навигации раскрывают свёрнутый год архива
+    (function () {
+      function openTarget() {
+        var h = location.hash;
+        if (!h) return;
+        var el = document.querySelector(h);
+        if (el && el.tagName === 'DETAILS') el.open = true;
+      }
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('a[href^="#y"]');
+        if (!a) return;
+        var el = document.querySelector(a.getAttribute('href'));
+        if (el && el.tagName === 'DETAILS') el.open = true;
+      });
+      window.addEventListener('hashchange', openTarget);
+      openTarget();
+    })();
+  </script>
 </Base>
