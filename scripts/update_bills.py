@@ -94,7 +94,27 @@ def find_law(data, number):
     for law in laws:
         if isinstance(law, dict) and str(law.get("number", "")).replace(" ", "") == norm:
             return law
-    return laws[0] if isinstance(laws[0], dict) else None
+    # точного совпадения строки нет, но если по запросу пришёл ровно один закон —
+    # это он (API мог хранить номер в другом формате)
+    if len(laws) == 1 and isinstance(laws[0], dict):
+        return laws[0]
+    return None
+
+
+def fetch_law(number, token):
+    """Ищет закон по полному номеру и по базовому (без суффикса созыва «-8»).
+
+    Возвращает (law|None, использованный_номер|None, последний_ответ).
+    """
+    base = number.split("-")[0]
+    variants = [number] + ([base] if base and base != number else [])
+    last_data = None
+    for v in variants:
+        last_data = fetch_response(v, token)
+        law = find_law(last_data, number)
+        if law is not None:
+            return law, v, last_data
+    return None, None, last_data
 
 
 def get_event(law):
@@ -170,15 +190,16 @@ def process_file(path, token, today):
         print(f"  {path.name}: нет номера законопроекта — пропуск")
         return False
     try:
-        data = fetch_response(number, token)
+        law, used, data = fetch_law(number, token)
     except Exception as e:  # сеть/таймаут/блокировка/токен — файл не трогаем
         print(f"  {path.name}: API недоступен или ошибка запроса ({e}) — без изменений")
         return False
-    law = find_law(data, number)
     if law is None:
         top = list(data.keys()) if isinstance(data, dict) else f"list[{len(data)}]"
-        print(f"  {path.name}: законопроект не найден в ответе. top-level={top}; sample={_sample(data)}")
+        print(f"  {path.name}: законопроект не найден (пробовал {number!r} и базовый номер). top-level={top}; sample={_sample(data)}")
         return False
+    if used != number:
+        print(f"  {path.name}: найден по номеру {used!r}")
     event = get_event(law)
     if event is None:
         print(f"  {path.name}: событие не найдено. ключи закона={sorted(law.keys())}; sample={_sample(law)}")
