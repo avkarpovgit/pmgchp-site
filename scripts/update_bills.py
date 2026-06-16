@@ -62,21 +62,55 @@ def _opener():
     return urllib.request.build_opener()
 
 
-def fetch_law(number, token):
-    """Запрос законопроекта по номеру. Возвращает dict закона или None."""
+def fetch_response(number, token):
+    """Сырой JSON-ответ API по номеру законопроекта."""
     qs = urllib.parse.urlencode({"number": number})
     url = f"{API_HOST}/api/{token}/search.json?{qs}"
     req = urllib.request.Request(url, headers={"User-Agent": "pmgchp-site/1.0"})
     raw = _opener().open(req, timeout=45).read().decode("utf-8", "replace")
-    data = json.loads(raw)
-    laws = data.get("laws") or data.get("bills") or []
-    if not laws:
+    return json.loads(raw)
+
+
+def find_law(data, number):
+    """Достаёт объект законопроекта из ответа (структура заранее не известна)."""
+    laws = None
+    if isinstance(data, list):
+        laws = data
+    elif isinstance(data, dict):
+        laws = data.get("laws") or data.get("bills") or data.get("items") or data.get("data")
+        if isinstance(laws, dict):
+            laws = laws.get("laws") or laws.get("items")
+    if not laws or not isinstance(laws, list):
         return None
     norm = number.replace(" ", "")
     for law in laws:
-        if str(law.get("number", "")).replace(" ", "") == norm:
+        if isinstance(law, dict) and str(law.get("number", "")).replace(" ", "") == norm:
             return law
-    return laws[0]
+    return laws[0] if isinstance(laws[0], dict) else None
+
+
+def get_event(law):
+    """Последнее событие законопроекта (имя поля заранее не известно)."""
+    for k in ("lastEvent", "last_event", "lastEvents", "events", "lastEventStage"):
+        v = law.get(k)
+        if isinstance(v, dict):
+            return v
+        if isinstance(v, list) and v and isinstance(v[-1], dict):
+            return v[-1]
+    for k, v in law.items():  # эвристика: любой ключ со словом «event»
+        if "event" in k.lower():
+            if isinstance(v, dict):
+                return v
+            if isinstance(v, list) and v and isinstance(v[-1], dict):
+                return v[-1]
+    return None
+
+
+def _sample(obj):
+    try:
+        return json.dumps(obj, ensure_ascii=False)[:800]
+    except Exception:
+        return repr(obj)[:800]
 
 
 def status_from_event(event):
@@ -128,17 +162,22 @@ def process_file(path, token, today):
         print(f"  {path.name}: нет номера законопроекта — пропуск")
         return False
     try:
-        law = fetch_law(number, token)
+        data = fetch_response(number, token)
     except Exception as e:  # сеть/таймаут/блокировка/токен — файл не трогаем
         print(f"  {path.name}: API недоступен или ошибка запроса ({e}) — без изменений")
         return False
-    if not law or not isinstance(law.get("lastEvent"), dict):
-        print(f"  {path.name}: нет данных lastEvent в ответе API — без изменений")
+    law = find_law(data, number)
+    if law is None:
+        top = list(data.keys()) if isinstance(data, dict) else f"list[{len(data)}]"
+        print(f"  {path.name}: законопроект не найден в ответе. top-level={top}; sample={_sample(data)}")
         return False
-    event = law["lastEvent"]
+    event = get_event(law)
+    if event is None:
+        print(f"  {path.name}: событие не найдено. ключи закона={sorted(law.keys())}; sample={_sample(law)}")
+        return False
     new_status = status_from_event(event)
     if not new_status:
-        print(f"  {path.name}: стадию не распознали ({event.get('phase')}) — без изменений")
+        print(f"  {path.name}: стадию не распознали. событие={_sample(event)}")
         return False
     old_status = (data.get("status") or "").strip()
     if new_status == old_status:
