@@ -62,14 +62,11 @@ def _opener():
     return urllib.request.build_opener()
 
 
-def fetch_response(number, token):
-    """Сырой JSON-ответ API по номеру законопроекта.
-
-    API Госдумы проверяет заголовок Referer на совпадение с доменом, указанным
-    при регистрации токена (по умолчанию http://pmgchp.ru; переопределяется
-    переменной DUMA_REFERER).
-    """
-    qs = urllib.parse.urlencode({"number": number})
+def _get(params, token):
+    """Низкоуровневый запрос к search.json. API Госдумы проверяет заголовок
+    Referer на совпадение с доменом из регистрации токена (по умолчанию
+    http://pmgchp.ru; переопределяется переменной DUMA_REFERER)."""
+    qs = urllib.parse.urlencode(params)
     url = f"{API_HOST}/api/{token}/search.json?{qs}"
     req = urllib.request.Request(url, headers={
         "User-Agent": "pmgchp-site/1.0",
@@ -77,6 +74,38 @@ def fetch_response(number, token):
     })
     raw = _opener().open(req, timeout=45).read().decode("utf-8", "replace")
     return json.loads(raw)
+
+
+def fetch_response(number, token):
+    """Сырой JSON-ответ API по номеру законопроекта."""
+    return _get({"number": number}, token)
+
+
+_PROBED = False
+
+
+def probe(token):
+    """Разовая диагностика: широкий поиск, печать структуры реального закона
+    (ключи + формат номера + где лежит событие). Запускается один раз."""
+    global _PROBED
+    if _PROBED:
+        return
+    _PROBED = True
+    try:
+        data = _get({"name": "о внесении изменений"}, token)
+    except Exception as e:
+        print(f"    [probe] широкий запрос не удался: {e}")
+        return
+    if not isinstance(data, dict):
+        print(f"    [probe] неожиданный ответ: {_sample(data)}")
+        return
+    laws = data.get("laws") or data.get("bills") or data.get("items") or []
+    print(f"    [probe] top-level={list(data.keys())} count={data.get('count')} laws={len(laws) if isinstance(laws, list) else type(laws).__name__}")
+    if isinstance(laws, list) and laws and isinstance(laws[0], dict):
+        print(f"    [probe] ключи закона={sorted(laws[0].keys())}")
+        print(f"    [probe] пример закона={_sample(laws[0])}")
+    else:
+        print(f"    [probe] sample={_sample(data)}")
 
 
 def find_law(data, number):
@@ -197,6 +226,7 @@ def process_file(path, token, today):
     if law is None:
         top = list(data.keys()) if isinstance(data, dict) else f"list[{len(data)}]"
         print(f"  {path.name}: законопроект не найден (пробовал {number!r} и базовый номер). top-level={top}; sample={_sample(data)}")
+        probe(token)  # разовая диагностика структуры/свежести датасета
         return False
     if used != number:
         print(f"  {path.name}: найден по номеру {used!r}")
