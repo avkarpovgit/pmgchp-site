@@ -819,27 +819,10 @@ main {
   color: var(--text-muted);
 }
 
-.cal-act.is-soon .cal-date {
-  border-color: var(--accent);
-  box-shadow: inset 3px 0 0 var(--accent);
-}
-
 .cal-body {
   flex: 1;
   min-width: 0;
   padding-top: 0.15rem;
-}
-
-.cal-lead {
-  display: inline-block;
-  font-size: 0.77rem;
-  color: var(--text-muted);
-  margin-bottom: 0.25rem;
-}
-
-.cal-act.is-soon .cal-lead {
-  color: var(--accent-dark);
-  font-weight: 600;
 }
 
 .cal-title {

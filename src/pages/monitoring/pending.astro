@@ -1,19 +1,15 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getPendingActs, plural } from '../../utils/monitoring';
+import { getPendingActs } from '../../utils/monitoring';
 
 const pending = await getPendingActs(); // отсортированы по дате вступления в силу (возр.)
 
 const MONTHS_NOM = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-const MONTHS_GEN = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 const MONTHS_SHORT = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
 
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-const fmtToday = `${today.getDate()} ${MONTHS_GEN[today.getMonth()]} ${today.getFullYear()}`;
-
-type Act = (typeof pending)[number] & { day: number; mon: number; year: number; lead: string; soon: boolean };
-type Row = { kind: 'month'; label: string } | ({ kind: 'act' } & Act);
+type Row =
+  | { kind: 'month'; label: string }
+  | ({ kind: 'act'; day: number; mon: number; year: number } & (typeof pending)[number]);
 
 const rows: Row[] = [];
 let lastMonthKey = '';
@@ -24,14 +20,7 @@ for (const a of pending) {
     rows.push({ kind: 'month', label: `${MONTHS_NOM[m - 1]} ${y}` });
     lastMonthKey = monthKey;
   }
-  const dt = new Date(y, m - 1, d);
-  const days = Math.round((dt.getTime() - today.getTime()) / 86400000);
-  const months = Math.floor(days / 30.44);
-  const lead =
-    days <= 0 ? 'вступает сегодня'
-    : days < 60 ? `через ${days} ${plural(days, ['день', 'дня', 'дней'])}`
-    : `через ${months} ${plural(months, ['месяц', 'месяца', 'месяцев'])}`;
-  rows.push({ kind: 'act', ...a, day: d, mon: m, year: y, lead, soon: days >= 0 && days <= 90 });
+  rows.push({ kind: 'act', ...a, day: d, mon: m, year: y });
 }
 ---
 
@@ -43,7 +32,6 @@ for (const a of pending) {
   <p class="subtitle" style="color: var(--text-muted); margin-top: 0.5rem;">
     Принятые акты из выпусков мониторинга, срок вступления в силу которых ещё не наступил —
     на шкале времени по датам. Список формируется автоматически по всем выпускам.
-    Отсчёт «через…» — от {fmtToday}.
   </p>
 
   {pending.length === 0 ? (
@@ -54,13 +42,12 @@ for (const a of pending) {
         r.kind === 'month' ? (
           <div class="cal-monthhead">{r.label}</div>
         ) : (
-          <div class={`cal-act${r.soon ? ' is-soon' : ''}`}>
+          <div class="cal-act">
             <div class="cal-date" aria-hidden="true">
               <span class="cal-day">{r.day}</span>
               <span class="cal-mon">{MONTHS_SHORT[r.mon - 1]} {r.year}</span>
             </div>
             <div class="cal-body">
-              <span class="cal-lead">{r.lead}</span>
               <a class="cal-title" href={r.url} target="_blank" rel="noopener">{r.title}</a>
               <span class="cal-src">из выпуска <a href={`/monitoring/${r.slug}/`}>{r.period}</a></span>
             </div>
