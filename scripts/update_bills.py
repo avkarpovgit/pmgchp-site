@@ -1,31 +1,32 @@
 #!/usr/bin/env python3
-"""Ежедневная авто-проверка статуса законопроектов через открытый API Госдумы
-(api.duma.gov.ru).
+"""Ежедневная авто-проверка статуса законопроектов по странице СОЗД
+(sozd.duma.gov.ru) — система обеспечения законодательной деятельности.
+
+Открытый API api.duma.gov.ru для этого непригоден: его датасет заморожен на
+~февраль 2025 (законов 2026 г. там нет). СОЗД же — живой server-rendered HTML
+без токена/Referer/прокси.
 
 Для каждого файла src/content/bills/*.md берёт номер законопроекта (`number`),
-запрашивает у API последнее событие (`lastEvent`), приводит стадию к короткой
-подписи и, если она изменилась, обновляет поле `status` и дописывает запись в
-историю `stages` (с датой события).
+скачивает sozd.duma.gov.ru/bill/<number>, определяет текущую стадию как самое
+продвинутое ДАТИРОВАННОЕ решение из хронологии и, если стадия изменилась,
+обновляет поле `status` и дописывает запись в историю `stages`.
 
-Требуется токен приложения API Госдумы в переменной окружения DUMA_API_TOKEN
-(регистрируется бесплатно на api.duma.gov.ru, хранится как секрет репозитория).
+Почему «датированное»: на странице есть и трекер будущих стадий (без дат) — он
+игнорируется; учитываются только уже состоявшиеся события, у которых рядом стоит
+дата ДД.ММ.ГГГГ. А привязка к словам-решениям («принять… в первом чтении»,
+«направить в Совет Федерации») отсекает упоминания других НПА в тексте.
 
-Fail-safe: нет токена / API недоступен / не распознали стадию / нет PyYAML →
-файл НЕ меняется, скрипт завершается с кодом 0 (сборка не падает). `status`
-всегда можно поправить вручную.
-
-ВНИМАНИЕ по доступности: api.duma.gov.ru, судя по проверкам, отклоняет
-TCP-соединения с зарубежных IP. Если GitHub Actions не сможет достучаться,
-задайте секрет DUMA_PROXY (http-прокси с российским IP) — скрипт пойдёт через
-него. Лог шага покажет, удалось ли соединение.
+Fail-safe: сеть/парсинг/без PyYAML → файл НЕ меняется, код возврата 0 (сборка не
+падает). `status` всегда можно поправить вручную. Если СОЗД когда-нибудь
+заблокирует раннер — задайте секрет DUMA_PROXY (http-прокси с РФ-IP).
 
 Запуск:  python3 scripts/update_bills.py [--selftest]
-Селф-тест проверяет нормализацию стадий и не требует сети/токена/PyYAML.
+Селф-тест проверяет detect_status на фикстуре, сеть/PyYAML не нужны.
 """
 import os
 import sys
 import re
-import json
+import html
 import datetime
 import pathlib
 import urllib.request
@@ -37,167 +38,72 @@ except ImportError:
     yaml = None
 
 BILLS_DIR = pathlib.Path(__file__).parent.parent / "src" / "content" / "bills"
-API_HOST = "http://api.duma.gov.ru"
+SOZD_URL = "https://sozd.duma.gov.ru/bill/{number}"
 
-# Стадии прохождения от наиболее продвинутой к наименее. lastEvent описывает
-# ТЕКУЩЕЕ состояние (а не список будущих стадий), поэтому достаточно сопоставить
-# текст фазы/решения с шаблонами и взять первое (самое продвинутое) совпадение.
+# Решения из хронологии СОЗД от наиболее продвинутого к наименее. Подпись —
+# короткая, для бейджа. Для стадий-чтений требуем слово «принят», чтобы не
+# спутать состоявшееся чтение с лишь назначенным на будущую дату.
 STAGES = [
-    (r"опубликован|вступил[аи]?\s+в\s+силу", "Опубликован"),
-    (r"у\s+президента|подписан[ие]*\s+президентом", "У Президента"),
-    (r"совет[еа]?\s+федерации", "В Совете Федерации"),
-    (r"треть[а-я]*\s+чтени|в\s+третьем\s+чтении", "III чтение"),
-    (r"втор[а-я]*\s+чтени|во\s+втором\s+чтении", "II чтение"),
-    (r"перв[а-я]*\s+чтени|в\s+первом\s+чтении", "I чтение"),
-    (r"предварительн|совет[а-я]*\s+(?:государственной\s+думы|гд)\b", "У Совета Госдумы"),
-    (r"внесен|внесение", "Внесён в Госдуму"),
+    (r"вступил[аи]?\s+в\s+силу|закон\s+опубликован|официальн\w*\s+опубликован", "Опубликован"),
+    (r"подписан[ао]?\s+президентом|подписан\s+федеральный\s+закон", "Подписан Президентом"),
+    (r"одобр\w+\s+совет\w*\s+федерации", "Одобрен Советом Федерации"),
+    (r"направ\w+\s+(?:закон\s+|законопроект\s+)?в\s+совет\s+федерации|рассмотрени\w+\s+советом\s+федерации", "Направлен в Совет Федерации"),
+    (r"принят\w*\s+(?:закон|(?:законопроект\s+)?(?:в\s+)?треть\w+\s+чтени)|одобрить\s+закон", "Принят Госдумой"),
+    (r"принят\w*\s+(?:законопроект\s+)?(?:во\s+)?втор\w+\s+чтени", "Принят во II чтении"),
+    (r"принят\w*\s+(?:законопроект\s+)?(?:в\s+)?перв\w+\s+чтени", "Принят в I чтении"),
+    (r"предварительн\w*\s+рассмотрени|назначить\s+ответственн|ответственн\w+\s+комитет", "У Совета Госдумы"),
+    (r"внесен\w*\s+в\s+государственную\s+думу|зарегистрирован\w*\s+и\s+направлен", "Внесён в Госдуму"),
 ]
+DATE_RE = re.compile(r"\b(\d{2})\.(\d{2})\.(\d{4})\b")
 
 
 def _opener():
     proxy = os.environ.get("DUMA_PROXY")
     if proxy:
-        handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
-        return urllib.request.build_opener(handler)
+        return urllib.request.build_opener(
+            urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+        )
     return urllib.request.build_opener()
 
 
-def _get(params, token):
-    """Низкоуровневый запрос к search.json. API Госдумы проверяет заголовок
-    Referer на совпадение с доменом из регистрации токена (по умолчанию
-    http://pmgchp.ru; переопределяется переменной DUMA_REFERER)."""
-    qs = urllib.parse.urlencode(params)
-    url = f"{API_HOST}/api/{token}/search.json?{qs}"
+def fetch(number):
+    url = SOZD_URL.format(number=urllib.parse.quote(number))
     req = urllib.request.Request(url, headers={
-        "User-Agent": "pmgchp-site/1.0",
-        "Referer": os.environ.get("DUMA_REFERER") or "http://pmgchp.ru",
+        "User-Agent": "Mozilla/5.0 (compatible; pmgchp-site/1.0)",
+        "Accept-Language": "ru",
     })
-    raw = _opener().open(req, timeout=45).read().decode("utf-8", "replace")
-    return json.loads(raw)
+    return _opener().open(req, timeout=60).read().decode("utf-8", "replace")
 
 
-def fetch_response(number, token):
-    """Сырой JSON-ответ API по номеру законопроекта."""
-    return _get({"number": number}, token)
+def to_text(page_html):
+    t = html.unescape(re.sub(r"<[^>]+>", " ", page_html))
+    return re.sub(r"\s+", " ", t)
 
 
-_PROBED = False
+def detect_status(page_html):
+    """(подпись стадии, дата ДД.ММ.ГГГГ) или (None, None).
 
-
-def probe(token):
-    """Разовая диагностика: широкий поиск, печать структуры реального закона
-    (ключи + формат номера + где лежит событие). Запускается один раз."""
-    global _PROBED
-    if _PROBED:
-        return
-    _PROBED = True
-    try:
-        data = _get({"name": "о внесении изменений"}, token)
-    except Exception as e:
-        print(f"    [probe] широкий запрос не удался: {e}")
-        return
-    if not isinstance(data, dict):
-        print(f"    [probe] неожиданный ответ: {_sample(data)}")
-        return
-    laws = data.get("laws") or data.get("bills") or data.get("items") or []
-    print(f"    [probe] top-level={list(data.keys())} count={data.get('count')} laws={len(laws) if isinstance(laws, list) else type(laws).__name__}")
-    if isinstance(laws, list) and laws and isinstance(laws[0], dict):
-        print(f"    [probe] ключи закона={sorted(laws[0].keys())}")
-        print(f"    [probe] пример закона={_sample(laws[0])}")
-    else:
-        print(f"    [probe] sample={_sample(data)}")
-
-
-def find_law(data, number):
-    """Достаёт объект законопроекта из ответа (структура заранее не известна)."""
-    laws = None
-    if isinstance(data, list):
-        laws = data
-    elif isinstance(data, dict):
-        laws = data.get("laws") or data.get("bills") or data.get("items") or data.get("data")
-        if isinstance(laws, dict):
-            laws = laws.get("laws") or laws.get("items")
-    if not laws or not isinstance(laws, list):
-        return None
-    norm = number.replace(" ", "")
-    for law in laws:
-        if isinstance(law, dict) and str(law.get("number", "")).replace(" ", "") == norm:
-            return law
-    # точного совпадения строки нет, но если по запросу пришёл ровно один закон —
-    # это он (API мог хранить номер в другом формате)
-    if len(laws) == 1 and isinstance(laws[0], dict):
-        return laws[0]
-    return None
-
-
-def fetch_law(number, token):
-    """Ищет закон по полному номеру и по базовому (без суффикса созыва «-8»).
-
-    Возвращает (law|None, использованный_номер|None, последний_ответ).
+    Берём самое продвинутое решение, рядом с которым (±90 символов) есть дата —
+    т.е. событие действительно состоялось, а не просто перечислено в трекере.
     """
-    base = number.split("-")[0]
-    variants = [number] + ([base] if base and base != number else [])
-    last_data = None
-    for v in variants:
-        last_data = fetch_response(v, token)
-        law = find_law(last_data, number)
-        if law is not None:
-            return law, v, last_data
-    return None, None, last_data
-
-
-def get_event(law):
-    """Последнее событие законопроекта (имя поля заранее не известно)."""
-    for k in ("lastEvent", "last_event", "lastEvents", "events", "lastEventStage"):
-        v = law.get(k)
-        if isinstance(v, dict):
-            return v
-        if isinstance(v, list) and v and isinstance(v[-1], dict):
-            return v[-1]
-    for k, v in law.items():  # эвристика: любой ключ со словом «event»
-        if "event" in k.lower():
-            if isinstance(v, dict):
-                return v
-            if isinstance(v, list) and v and isinstance(v[-1], dict):
-                return v[-1]
-    return None
-
-
-def _sample(obj):
-    try:
-        return json.dumps(obj, ensure_ascii=False)[:800]
-    except Exception:
-        return repr(obj)[:800]
-
-
-def status_from_event(event):
-    """lastEvent (dict) → короткая подпись стадии или None."""
-    parts = []
-    for key in ("phase", "stage"):
-        v = event.get(key)
-        if isinstance(v, dict):
-            parts.append(v.get("name", "") or "")
-        elif isinstance(v, str):
-            parts.append(v)
-    parts.append(event.get("solution", "") or "")
-    parts.append(event.get("name", "") or "")
-    text = " ".join(p for p in parts if p)
+    text = to_text(page_html)
     for pat, label in STAGES:
-        if re.search(pat, text, re.I):
-            return label
-    return None
+        for m in re.finditer(pat, text, re.I):
+            window = text[max(0, m.start() - 90): m.end() + 90]
+            dm = DATE_RE.search(window)
+            if dm:
+                return label, dm.group(0)
+    return None, None
 
 
-def event_date(event, today):
-    """Дата события для истории: ISO или ДД.ММ.ГГГГ из lastEvent, иначе сегодня."""
-    raw = (event.get("date") or "").strip()
-    m = re.match(r"^(\d{4})-(\d{2})-(\d{2})", raw)
-    if m:
-        return datetime.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
-    m = re.match(r"^(\d{2})\.(\d{2})\.(\d{4})", raw)
-    if m:
+def parse_date(s, today):
+    m = DATE_RE.match(s) if s else None
+    if not m:
+        return today
+    try:
         return datetime.date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
-    return today
+    except ValueError:
+        return today
 
 
 def split_frontmatter(txt):
@@ -207,7 +113,7 @@ def split_frontmatter(txt):
     return m.group(1), m.group(2)
 
 
-def process_file(path, token, today):
+def process_file(path, today):
     raw = path.read_text(encoding="utf-8")
     fm_text, body = split_frontmatter(raw)
     if fm_text is None:
@@ -219,35 +125,24 @@ def process_file(path, token, today):
         print(f"  {path.name}: нет номера законопроекта — пропуск")
         return False
     try:
-        law, used, data = fetch_law(number, token)
-    except Exception as e:  # сеть/таймаут/блокировка/токен — файл не трогаем
-        print(f"  {path.name}: API недоступен или ошибка запроса ({e}) — без изменений")
+        page = fetch(number)
+    except Exception as e:  # сеть/таймаут/блокировка — файл не трогаем
+        print(f"  {path.name}: СОЗД недоступен ({e}) — без изменений")
         return False
-    if law is None:
-        top = list(data.keys()) if isinstance(data, dict) else f"list[{len(data)}]"
-        print(f"  {path.name}: законопроект не найден (пробовал {number!r} и базовый номер). top-level={top}; sample={_sample(data)}")
-        probe(token)  # разовая диагностика структуры/свежести датасета
-        return False
-    if used != number:
-        print(f"  {path.name}: найден по номеру {used!r}")
-    event = get_event(law)
-    if event is None:
-        print(f"  {path.name}: событие не найдено. ключи закона={sorted(law.keys())}; sample={_sample(law)}")
-        return False
-    new_status = status_from_event(event)
+    new_status, when = detect_status(page)
     if not new_status:
-        print(f"  {path.name}: стадию не распознали. событие={_sample(event)}")
+        print(f"  {path.name}: стадию на странице СОЗД не распознали ({len(page)} байт) — без изменений")
         return False
+    print(f"  {path.name}: СОЗД → {new_status!r} (событие {when})")
     old_status = (data.get("status") or "").strip()
     if new_status == old_status:
-        print(f"  {path.name}: без изменений ({old_status})")
         return False
     data["status"] = new_status
     stages = data.get("stages") or []
-    stages.append({"stage": new_status, "date": event_date(event, today)})
+    stages.append({"stage": new_status, "date": parse_date(when, today)})
     data["stages"] = stages
     new_fm = yaml.safe_dump(
-        data, allow_unicode=True, sort_keys=False, default_flow_style=False
+        data, allow_unicode=True, sort_keys=False, default_flow_style=False, width=4096
     ).rstrip("\n")
     path.write_text(f"---\n{new_fm}\n---\n{body}", encoding="utf-8")
     print(f"  {path.name}: {old_status!r} -> {new_status!r} (обновлено)")
@@ -255,10 +150,6 @@ def process_file(path, token, today):
 
 
 def main():
-    token = os.environ.get("DUMA_API_TOKEN", "").strip()
-    if not token:
-        print("DUMA_API_TOKEN не задан — обновление статусов пропущено")
-        return 0
     if yaml is None:
         print("PyYAML не установлен — обновление статусов пропущено")
         return 0
@@ -273,7 +164,7 @@ def main():
     changed = 0
     for f in files:
         try:
-            if process_file(f, token, today):
+            if process_file(f, today):
                 changed += 1
         except Exception as e:
             print(f"  {f.name}: ошибка обработки ({e}) — пропуск")
@@ -281,26 +172,35 @@ def main():
     return 0
 
 
-# --- Селф-тест: нормализация стадий из lastEvent (без сети/токена/PyYAML) ---
+# --- Селф-тест: detect_status по фикстуре хронологии (без сети/PyYAML) ---
+FIXTURE_FULL = """
+<ul class="tracker"><li>Внесение</li><li>Предварительное рассмотрение</li>
+<li>Рассмотрение в первом чтении</li><li>Рассмотрение во втором чтении</li>
+<li>Рассмотрение в третьем чтении</li><li>Прохождение закона в Совете Федерации</li></ul>
+<div id="hron">
+08.06.2026 Внесён в Государственную Думу, зарегистрирован и направлен Председателю ГД.
+09.06.2026 Назначить ответственный комитет.
+10.06.2026 Принять законопроект в первом чтении.
+10.06.2026 Принять закон.
+10.06.2026 Направить закон в Совет Федерации.
+</div>
+"""
+FIXTURE_EARLY = """
+<ul class="tracker"><li>Рассмотрение в первом чтении</li></ul>
+<div id="hron">08.06.2026 Внесён в Государственную Думу. 09.06.2026 Назначить ответственный комитет.</div>
+"""
+
+
 def selftest():
-    cases = [
-        ({"phase": {"name": "Внесение законопроекта в Государственную Думу"}}, "Внесён в Госдуму"),
-        ({"phase": {"name": "Предварительное рассмотрение законопроекта, внесенного в Государственную Думу"}}, "У Совета Госдумы"),
-        ({"phase": {"name": "Рассмотрение законопроекта в первом чтении"}, "solution": "принять в первом чтении"}, "I чтение"),
-        ({"phase": {"name": "Рассмотрение законопроекта во втором чтении"}}, "II чтение"),
-        ({"phase": {"name": "Рассмотрение законопроекта в третьем чтении"}}, "III чтение"),
-        ({"phase": {"name": "Прохождение закона в Совете Федерации Федерального Собрания Российской Федерации"}}, "В Совете Федерации"),
-        ({"phase": {"name": "Прохождение закона у Президента Российской Федерации"}}, "У Президента"),
-        ({"phase": {"name": "Опубликование закона"}}, "Опубликован"),
-        ({"phase": {"name": "Нечто непонятное"}}, None),
-    ]
-    for ev, expected in cases:
-        got = status_from_event(ev)
-        assert got == expected, f"для {ev.get('phase')}: ожидалось {expected!r}, получено {got!r}"
-    assert event_date({"date": "2026-06-13"}, datetime.date(2026, 1, 1)) == datetime.date(2026, 6, 13)
-    assert event_date({"date": "13.06.2026"}, datetime.date(2026, 1, 1)) == datetime.date(2026, 6, 13)
-    assert event_date({}, datetime.date(2026, 1, 1)) == datetime.date(2026, 1, 1)
-    print("selftest OK: нормализация стадий и разбор даты события работают")
+    s, d = detect_status(FIXTURE_FULL)
+    assert s == "Направлен в Совет Федерации", f"FULL: {s!r}"
+    assert d == "10.06.2026", f"FULL date: {d!r}"
+    s2, _ = detect_status(FIXTURE_EARLY)
+    assert s2 == "У Совета Госдумы", f"EARLY: {s2!r}"  # «первом чтении» без даты — игнор
+    s3, _ = detect_status("<div>нет ни дат, ни решений</div>")
+    assert s3 is None, f"EMPTY: {s3!r}"
+    assert parse_date("10.06.2026", datetime.date(2000, 1, 1)) == datetime.date(2026, 6, 10)
+    print("selftest OK: detect_status берёт самое продвинутое датированное решение")
     return 0
 
 

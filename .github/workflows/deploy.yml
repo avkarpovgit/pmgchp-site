@@ -31,10 +31,9 @@ jobs:
             git push
           fi
 
-      - name: Обновить статусы законопроектов (API Госдумы)
+      - name: Обновить статусы законопроектов (СОЗД)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
-          DUMA_API_TOKEN: ${{ secrets.DUMA_API_TOKEN }}
           DUMA_PROXY: ${{ secrets.DUMA_PROXY }}
         run: |
           python3 -m pip install --quiet --user pyyaml || true
@@ -44,7 +43,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add src/content/bills/
-            git commit -m "Законопроекты: обновление статусов (API Госдумы, авто)"
+            git commit -m "Законопроекты: обновление статусов с СОЗД (авто)"
             git push
           fi
 
