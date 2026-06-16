@@ -63,10 +63,18 @@ def _opener():
 
 
 def fetch_response(number, token):
-    """Сырой JSON-ответ API по номеру законопроекта."""
+    """Сырой JSON-ответ API по номеру законопроекта.
+
+    API Госдумы проверяет заголовок Referer на совпадение с доменом, указанным
+    при регистрации токена (по умолчанию http://pmgchp.ru; переопределяется
+    переменной DUMA_REFERER).
+    """
     qs = urllib.parse.urlencode({"number": number})
     url = f"{API_HOST}/api/{token}/search.json?{qs}"
-    req = urllib.request.Request(url, headers={"User-Agent": "pmgchp-site/1.0"})
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "pmgchp-site/1.0",
+        "Referer": os.environ.get("DUMA_REFERER") or "http://pmgchp.ru",
+    })
     raw = _opener().open(req, timeout=45).read().decode("utf-8", "replace")
     return json.loads(raw)
 
