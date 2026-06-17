@@ -80,7 +80,8 @@
 <a href="mailto:pmgchp@gmail.com">pmgchp@gmail.com</a> </span> </div> <div class="container footer-legal"> <span>
 Материалы сайта — <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> ·
 <a href="/terms/">Пользовательское соглашение</a> ·
-<a href="/rss.xml">RSS</a> </span> </div> </footer> <script>
+<a href="/rss.xml">RSS</a> ·
+<a href="#" id="cookie-reset">Настройки cookie</a> </span> </div> </footer> <script>
       // Переключатель светлой/тёмной темы
       (function () {
         var btn = document.getElementById('theme-toggle');
@@ -188,6 +189,16 @@
     </script> <!-- Cookie-согласие + Яндекс.Метрика: счётчик грузится ТОЛЬКО после явного согласия --> <script type="text/javascript">
       (function () {
         var KEY = 'analyticsConsent'; // 'granted' | 'denied'
+
+        // Ссылка «Настройки cookie» в футере — сбросить согласие и показать баннер снова
+        var resetLink = document.getElementById('cookie-reset');
+        if (resetLink) {
+          resetLink.addEventListener('click', function (ev) {
+            ev.preventDefault();
+            try { localStorage.removeItem(KEY); } catch (e) {}
+            location.reload();
+          });
+        }
 
         function loadMetrika() {
           if (window.__ymLoaded) return;
