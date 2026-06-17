@@ -2,10 +2,10 @@
 import Base from '../layouts/Base.astro';
 ---
 
-<Base title="Поиск — Правовой мониторинг ГЧП" description="Поиск по статьям блога и архиву правового мониторинга ГЧП.">
+<Base title="Поиск — Правовой мониторинг ГЧП" description="Поиск по новостям ГЧП, статьям блога и архиву правового мониторинга.">
   <h1>Поиск</h1>
   <p style="color: var(--text-muted);">
-    По блогу и архиву мониторинга — например, «МГД», «капитальный грант» или номер закона.
+    По новостям, блогу и архиву мониторинга — например, «МГД», «капитальный грант» или номер закона.
   </p>
 
   <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
@@ -13,7 +13,7 @@ import Base from '../layouts/Base.astro';
     <p>
       Для работы поиска нужен включённый JavaScript. Альтернатива — поиск по
       <a href="https://t.me/s/pmgchp" target="_blank" rel="noopener">веб-версии телеграм-канала</a>
-      или разделы <a href="/blog/">«Блог»</a> и <a href="/monitoring/">«Мониторинг»</a>.
+      или разделы <a href="/news/">«Новости»</a>, <a href="/blog/">«Блог»</a> и <a href="/monitoring/">«Мониторинг»</a>.
     </p>
   </noscript>
   <div id="search" class="search-box">Поиск загружается…</div>
@@ -23,7 +23,7 @@ import Base from '../layouts/Base.astro';
     window.addEventListener('DOMContentLoaded', function () {
       if (typeof PagefindUI === 'undefined') {
         document.getElementById('search').textContent =
-          'Не удалось загрузить поиск. Обновите страницу или воспользуйтесь разделами «Блог» и «Мониторинг».';
+          'Не удалось загрузить поиск. Обновите страницу или воспользуйтесь разделами «Новости», «Блог» и «Мониторинг».';
         return;
       }
       document.getElementById('search').textContent = '';
