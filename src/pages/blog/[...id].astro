@@ -33,7 +33,7 @@ const related = all
   .map((x) => x.p);
 ---
 
-<Base title={`${post.data.title} — Правовой мониторинг ГЧП`} description={post.data.description} ogType="article" publishDate={post.data.date}>
+<Base title={`${post.data.title} — Правовой мониторинг ГЧП`} description={post.data.description} ogType="article" publishDate={post.data.date} breadcrumb={[{ name: 'Главная', href: '/' }, { name: 'Блог', href: '/blog/' }, { name: post.data.title, href: `/blog/${post.id}/` }]}>
   <article>
     <header class="article-header">
       <p class="post-date">{formatDate(post.data.date)}</p>

@@ -22,6 +22,7 @@ const formatDate = (d: Date) =>
   description={`Дайджест новостей ГЧП и проектного финансирования за ${release.data.period}: ключевые законопроекты, сделки, судебная практика и аналитика.`}
   ogType="article"
   publishDate={release.data.date}
+  breadcrumb={[{ name: 'Главная', href: '/' }, { name: 'Новости', href: '/news/' }, { name: release.data.title, href: `/news/${release.id}/` }]}
 >
   <article>
     <header class="article-header">

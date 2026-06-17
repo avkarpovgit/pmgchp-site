@@ -7,6 +7,7 @@ interface Props {
   ogType?: 'website' | 'article';
   ogImage?: string;
   publishDate?: Date;
+  breadcrumb?: { name: string; href: string }[];
 }
 
 const {
@@ -15,6 +16,7 @@ const {
   ogType = 'website',
   ogImage = '/images/og-default.jpg',
   publishDate,
+  breadcrumb,
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
@@ -41,6 +43,7 @@ const articleLd = ogType === 'article' && publishDate ? {
   headline: title,
   description: description,
   datePublished: publishDate.toISOString().slice(0, 10),
+  dateModified: publishDate.toISOString().slice(0, 10),
   inLanguage: 'ru-RU',
   url: canonicalURL.toString(),
   author: {
@@ -52,6 +55,17 @@ const articleLd = ogType === 'article' && publishDate ? {
     '@type': 'Person',
     name: 'Александр Карпов',
   },
+} : null;
+
+const breadcrumbLd = breadcrumb && breadcrumb.length ? {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: breadcrumb.map((b, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: b.name,
+    item: new URL(b.href, Astro.site).toString(),
+  })),
 } : null;
 ---
 
@@ -98,6 +112,7 @@ const articleLd = ogType === 'article' && publishDate ? {
     <meta name="twitter:image" content={ogImageURL} />
 
     {articleLd && <script type="application/ld+json" set:html={JSON.stringify(articleLd)} />}
+    {breadcrumbLd && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}
     <slot name="head" />
 
     <title>{title}</title>

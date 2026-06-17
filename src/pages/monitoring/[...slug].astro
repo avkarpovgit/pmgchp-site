@@ -22,6 +22,7 @@ const formatDate = (d: Date) =>
   description={`Правовой мониторинг ГЧП за ${release.data.period}: ключевые нормативные акты и судебная практика по концессиям и государственно-частному партнёрству.`}
   ogType="article"
   publishDate={release.data.date}
+  breadcrumb={[{ name: 'Главная', href: '/' }, { name: 'Мониторинг', href: '/monitoring/' }, { name: release.data.title, href: `/monitoring/${release.id}/` }]}
 >
   <article>
     <header class="article-header">

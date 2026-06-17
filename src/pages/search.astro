@@ -42,6 +42,11 @@ import Base from '../layouts/Base.astro';
         },
       });
       var input = document.querySelector('#search input');
+      var q = new URLSearchParams(location.search).get('q');
+      if (input && q) {
+        input.value = q;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
       if (input && window.matchMedia('(pointer: fine)').matches && window.innerWidth >= 900) {
         input.focus();
       }

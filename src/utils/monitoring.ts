@@ -32,10 +32,23 @@ export async function getPendingActs(): Promise<PendingAct[]> {
   for (const p of pages) {
     const body: string = (p as { body?: string }).body ?? '';
     for (const line of body.split('\n')) {
-      const dm = line.match(/вступает в силу\s+(\d{2})\.(\d{2})\.(\d{4})/);
       const lm = line.match(/\[(.+?)\]\((https?:\/\/[^\s")]+)/);
-      if (!dm || !lm) continue;
-      const [, dd, mm, yyyy] = dm;
+      if (!lm) continue;
+      // «вступает/вступают в силу [с] ДД.ММ.ГГГГ» либо вербально «… в силу с 1 сентября 2026»
+      let dd = '', mm = '', yyyy = '';
+      const numMatch = line.match(/вступа(?:ет|ют) в силу\s+(?:с\s+)?(\d{2})\.(\d{2})\.(\d{4})/);
+      const verbMatch = numMatch ? null : line.match(/вступа(?:ет|ют) в силу\s+с\s+(\d{1,2})\s+([а-яё]+)\s+(\d{4})/i);
+      if (numMatch) {
+        [, dd, mm, yyyy] = numMatch;
+      } else if (verbMatch) {
+        const mi = MONTHS_RU.indexOf(verbMatch[2].toLowerCase());
+        if (mi === -1) continue;
+        dd = verbMatch[1].padStart(2, '0');
+        mm = String(mi + 1).padStart(2, '0');
+        yyyy = verbMatch[3];
+      } else {
+        continue;
+      }
       const d = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
       d.setHours(0, 0, 0, 0);
       if (d <= today) continue;
