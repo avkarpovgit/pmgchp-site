@@ -38,7 +38,7 @@ jobs:
         run: |
           python3 -m pip install --quiet --user pyyaml || true
           python3 scripts/update_bills.py --selftest
-          python3 scripts/update_bills.py || true
+          python3 scripts/update_bills.py || echo "::warning::update_bills.py: статусы законопроектов с СОЗД не обновлены (источник недоступен или не распознан)"
           if ! git diff --quiet src/content/bills/; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
