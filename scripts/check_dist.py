@@ -14,6 +14,7 @@ DIST = pathlib.Path(__file__).parent.parent / "dist"
 REQUIRED = [
     "index.html",
     "monitoring/index.html",
+    "news/index.html",
     "blog/index.html",
     "experience/index.html",
     "search/index.html",
