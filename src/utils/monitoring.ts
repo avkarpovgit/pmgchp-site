@@ -1,4 +1,5 @@
 import { getCollection } from 'astro:content';
+import releases from '../data/monitoring.json';
 
 /** «23 - 28 марта 2026 г» → «23 — 28 марта 2026» */
 export const cleanPeriod = (p: string) =>
@@ -80,3 +81,58 @@ export const plural = (n: number, forms: [string, string, string]) => {
   if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return forms[1];
   return forms[2];
 };
+
+export type MonitoringEntry = {
+  date: string;
+  period: string;
+  items: string[];
+  slug?: string;
+  tgId?: number;
+};
+
+type RawRelease = { id: number; date: string; period: string; items: string[] };
+
+/**
+ * Единый список выпусков мониторинга (Telegram-лента monitoring.json + выпуски,
+ * добавленные вручную как .md), сгруппированный по годам и отсортированный (desc).
+ */
+export async function getMonitoringByYear(): Promise<{
+  years: string[];
+  byYear: Map<string, MonitoringEntry[]>;
+  currentYear: string;
+}> {
+  const pages = await getCollection('monitoring');
+  const byTgId = new Map<number, string>();
+  for (const p of pages) if (p.data.tgId != null) byTgId.set(p.data.tgId, p.id);
+  const releaseIds = new Set((releases as RawRelease[]).map((r) => r.id));
+
+  const entries: MonitoringEntry[] = [];
+  for (const r of releases as RawRelease[]) {
+    entries.push({ date: r.date, period: r.period, items: r.items, slug: byTgId.get(r.id), tgId: r.id });
+  }
+  for (const p of pages) {
+    // выпуск уже учтён через Telegram-ленту — пропускаем
+    if (p.data.tgId != null && releaseIds.has(p.data.tgId)) continue;
+    const body: string = (p as { body?: string }).body ?? '';
+    const items = [...body.matchAll(/^###\s+(.+?)\s*$/gm)].map((m) => m[1].trim());
+    entries.push({
+      date: p.data.date.toISOString().slice(0, 10),
+      period: p.data.period,
+      items,
+      slug: p.id,
+      tgId: p.data.tgId ?? undefined,
+    });
+  }
+
+  const byYear = new Map<string, MonitoringEntry[]>();
+  for (const e of entries) {
+    const year = e.date.slice(0, 4);
+    if (!byYear.has(year)) byYear.set(year, []);
+    byYear.get(year)!.push(e);
+  }
+  for (const arr of byYear.values()) {
+    arr.sort((a, b) => b.date.localeCompare(a.date) || (b.tgId ?? 0) - (a.tgId ?? 0));
+  }
+  const years = [...byYear.keys()].sort((a, b) => b.localeCompare(a));
+  return { years, byYear, currentYear: years[0] };
+}

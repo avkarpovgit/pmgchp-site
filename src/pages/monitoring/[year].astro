@@ -1,0 +1,54 @@
+---
+import Base from '../../layouts/Base.astro';
+import { cleanPeriod, getMonitoringByYear, plural } from '../../utils/monitoring';
+
+export async function getStaticPaths() {
+  const { years, byYear } = await getMonitoringByYear();
+  return years.map((y) => ({
+    params: { year: y },
+    props: { year: y, entries: byYear.get(y)! },
+  }));
+}
+
+const { year, entries } = Astro.props;
+---
+
+<Base
+  title={`Мониторинг ГЧП за ${year} год — Правовой мониторинг ГЧП`}
+  description={`Выпуски правового мониторинга ГЧП за ${year} год: ключевые нормативные акты и судебная практика по концессиям и государственно-частному партнёрству.`}
+  breadcrumb={[
+    { name: 'Главная', href: '/' },
+    { name: 'Мониторинг', href: '/monitoring/' },
+    { name: year, href: `/monitoring/${year}/` },
+  ]}
+>
+  <h1>Правовой мониторинг — {year}</h1>
+  <p class="subtitle" style="color: var(--text-muted); margin-top: 0.5rem;">
+    {entries.length}&nbsp;{plural(entries.length, ['выпуск', 'выпуска', 'выпусков'])} за {year} год.
+  </p>
+
+  <ul class="monitoring-list">
+    {entries.map((r) => (
+      <li>
+        {r.slug ? (
+          <a href={`/monitoring/${r.slug}/`}>{cleanPeriod(r.period)}</a>
+        ) : (
+          <a href={`https://t.me/pmgchp/${r.tgId}`} target="_blank" rel="noopener">{cleanPeriod(r.period)}</a>
+        )}
+        {r.tgId != null && (
+          <a class="release-tg" href={`https://t.me/pmgchp/${r.tgId}`} target="_blank" rel="noopener" title="Выпуск в Telegram">TG ↗</a>
+        )}
+        {r.items.length > 0 && (
+          <details class="release-details">
+            <summary>Содержание ({r.items.length})</summary>
+            <ul class="release-items">
+              {r.items.map((item) => <li>{item}</li>)}
+            </ul>
+          </details>
+        )}
+      </li>
+    ))}
+  </ul>
+
+  <p style="margin-top: 3rem;"><a href="/monitoring/">← Весь мониторинг</a></p>
+</Base>

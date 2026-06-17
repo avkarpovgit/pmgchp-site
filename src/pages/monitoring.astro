@@ -1,45 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
-import releases from '../data/monitoring.json';
-import { cleanPeriod, getPendingActs, plural } from '../utils/monitoring';
+import { cleanPeriod, getPendingActs, plural, getMonitoringByYear } from '../utils/monitoring';
 
-type Release = { id: number; date: string; period: string; items: string[] };
+const { years, byYear } = await getMonitoringByYear();
+const recent = years.flatMap((y) => byYear.get(y)!).slice(0, 12);
 
-const pages = await getCollection('monitoring');
-const byTgId = new Map<number, string>();
-for (const p of pages) if (p.data.tgId != null) byTgId.set(p.data.tgId, p.id);
-const releaseIds = new Set((releases as Release[]).map((r) => r.id));
-
-// --- Единый список выпусков: Telegram-лента + выпуски, добавленные вручную ---
-type Entry = { date: string; period: string; items: string[]; slug?: string; tgId?: number };
-const entries: Entry[] = [];
-for (const r of releases as Release[]) {
-  entries.push({ date: r.date, period: r.period, items: r.items, slug: byTgId.get(r.id), tgId: r.id });
-}
-for (const p of pages) {
-  // выпуск уже учтён через Telegram-ленту (monitoring.json) — пропускаем
-  if (p.data.tgId != null && releaseIds.has(p.data.tgId)) continue;
-  // иначе — это страница-выпуск, которой нет в monitoring.json: добавленная вручную
-  // (возможно, уже с пост-id из Telegram, пока авто-апдейтер её не подхватил)
-  const body = p.body ?? '';
-  const items = [...body.matchAll(/^###\s+(.+?)\s*$/gm)].map((m) => m[1].trim());
-  entries.push({ date: p.data.date.toISOString().slice(0, 10), period: p.data.period, items, slug: p.id, tgId: p.data.tgId ?? undefined });
-}
-
-const byYear = new Map<string, Entry[]>();
-for (const e of entries) {
-  const year = e.date.slice(0, 4);
-  if (!byYear.has(year)) byYear.set(year, []);
-  byYear.get(year)!.push(e);
-}
-for (const arr of byYear.values()) {
-  arr.sort((a, b) => b.date.localeCompare(a.date) || (b.tgId ?? 0) - (a.tgId ?? 0));
-}
-const years = [...byYear.keys()].sort((a, b) => b.localeCompare(a));
-const currentYear = years[0];
-
-// Счётчики для тизеров «что мы отслеживаем»
 const billsCount = (await getCollection('bills', ({ data }) => !data.draft)).length;
 const pendingCount = (await getPendingActs()).length;
 ---
@@ -69,61 +35,38 @@ const pendingCount = (await getPendingActs()).length;
     </a>
   </div>
 
+  <h2>Последние выпуски</h2>
+  <ul class="monitoring-list">
+    {recent.map((r) => (
+      <li>
+        {r.slug ? (
+          <a href={`/monitoring/${r.slug}/`}>{cleanPeriod(r.period)}</a>
+        ) : (
+          <a href={`https://t.me/pmgchp/${r.tgId}`} target="_blank" rel="noopener">{cleanPeriod(r.period)}</a>
+        )}
+        {r.tgId != null && (
+          <a class="release-tg" href={`https://t.me/pmgchp/${r.tgId}`} target="_blank" rel="noopener" title="Выпуск в Telegram">TG ↗</a>
+        )}
+        {r.items.length > 0 && (
+          <details class="release-details">
+            <summary>Содержание ({r.items.length})</summary>
+            <ul class="release-items">
+              {r.items.map((item) => <li>{item}</li>)}
+            </ul>
+          </details>
+        )}
+      </li>
+    ))}
+  </ul>
+
+  <h2>Архив по годам</h2>
   <nav class="anchor-nav">
-    {years.map((y) => <a href={`#y${y}`}>{y}</a>)}
+    {years.map((y) => (
+      <a
+        href={`/monitoring/${y}/`}
+        title={`${byYear.get(y)!.length} ${plural(byYear.get(y)!.length, ['выпуск', 'выпуска', 'выпусков'])}`}
+        >{y}</a
+      >
+    ))}
   </nav>
-
-  {years.map((year) => {
-    const list = byYear.get(year)!;
-    return (
-      <details class="year-block" id={`y${year}`} open={year === currentYear}>
-        <summary>
-          <h2 class="year-heading">{year}</h2>
-          <span class="year-count">{list.length}&nbsp;{plural(list.length, ['выпуск', 'выпуска', 'выпусков'])}</span>
-        </summary>
-        <ul class="monitoring-list">
-          {list.map((r) => (
-            <li>
-              {r.slug ? (
-                <a href={`/monitoring/${r.slug}/`}>{cleanPeriod(r.period)}</a>
-              ) : (
-                <a href={`https://t.me/pmgchp/${r.tgId}`} target="_blank" rel="noopener">{cleanPeriod(r.period)}</a>
-              )}
-              {r.tgId != null && (
-                <a class="release-tg" href={`https://t.me/pmgchp/${r.tgId}`} target="_blank" rel="noopener" title="Выпуск в Telegram">TG ↗</a>
-              )}
-              {r.items.length > 0 && (
-                <details class="release-details">
-                  <summary>Содержание ({r.items.length})</summary>
-                  <ul class="release-items">
-                    {r.items.map((item) => <li>{item}</li>)}
-                  </ul>
-                </details>
-              )}
-            </li>
-          ))}
-        </ul>
-      </details>
-    );
-  })}
-
-  <script is:inline>
-    // Якоря в навигации раскрывают свёрнутый год архива
-    (function () {
-      function openTarget() {
-        var h = location.hash;
-        if (!h) return;
-        var el = document.querySelector(h);
-        if (el && el.tagName === 'DETAILS') el.open = true;
-      }
-      document.addEventListener('click', function (e) {
-        var a = e.target.closest && e.target.closest('a[href^="#y"]');
-        if (!a) return;
-        var el = document.querySelector(a.getAttribute('href'));
-        if (el && el.tagName === 'DETAILS') el.open = true;
-      });
-      window.addEventListener('hashchange', openTarget);
-      openTarget();
-    })();
-  </script>
 </Base>
