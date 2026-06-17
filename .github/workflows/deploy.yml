@@ -57,6 +57,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Тайп-чек (astro check)
+        run: npm run check
+
       - run: npm run build
 
       - name: Smoke-проверка сборки

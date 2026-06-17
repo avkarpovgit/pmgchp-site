@@ -9,7 +9,11 @@
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check": "astro check",
+    "format": "prettier --check \"src/**/*.{astro,ts,js}\"",
+    "format:write": "prettier --write \"src/**/*.{astro,ts,js}\"",
+    "spellcheck": "yaspeller \"src/content/**/*.md\""
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.18",
@@ -17,6 +21,11 @@
     "astro": "^6.4.6"
   },
   "devDependencies": {
-    "pagefind": "^1.5.2"
+    "@astrojs/check": "^0.9.9",
+    "pagefind": "^1.5.2",
+    "prettier": "^3.8.4",
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript": "^6.0.3",
+    "yaspeller": "^10.0.1"
   }
 }

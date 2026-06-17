@@ -1,0 +1,7 @@
+node_modules
+dist
+public
+pagefind
+src/content
+src/data
+*.md

@@ -1,7 +1,7 @@
 ---
 import Base from '../../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
-import { TAG_SLUGS, tagSlug } from '../../../utils/tags';
+import { tagSlug } from '../../../utils/tags';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
