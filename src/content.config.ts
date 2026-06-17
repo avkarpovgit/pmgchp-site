@@ -24,6 +24,17 @@ const monitoring = defineCollection({
   }),
 });
 
+const news = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/news' }),
+  schema: z.object({
+    title: z.string(),
+    period: z.string(),
+    date: z.coerce.date(),
+    // tgId есть у выпусков, опубликованных в Telegram (пост в канале); у черновиков — нет.
+    tgId: z.number().optional(),
+  }),
+});
+
 const bills = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/bills' }),
   schema: z.object({
@@ -40,4 +51,4 @@ const bills = defineCollection({
   }),
 });
 
-export const collections = { blog, monitoring, bills };
+export const collections = { blog, monitoring, news, bills };

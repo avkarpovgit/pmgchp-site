@@ -1,0 +1,90 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { cleanPeriod, plural } from '../utils/monitoring';
+
+type Entry = { date: string; period: string; title: string; slug: string; tgId?: number };
+
+const pages = await getCollection('news');
+const entries: Entry[] = pages.map((p) => ({
+  date: p.data.date.toISOString().slice(0, 10),
+  period: p.data.period,
+  title: p.data.title,
+  slug: p.id,
+  tgId: p.data.tgId ?? undefined,
+}));
+
+const byYear = new Map<string, Entry[]>();
+for (const e of entries) {
+  const year = e.date.slice(0, 4);
+  if (!byYear.has(year)) byYear.set(year, []);
+  byYear.get(year)!.push(e);
+}
+for (const arr of byYear.values()) arr.sort((a, b) => b.date.localeCompare(a.date));
+const years = [...byYear.keys()].sort((a, b) => b.localeCompare(a));
+const currentYear = years[0];
+---
+
+<Base
+  title="Новости ГЧП — дайджест недели | Правовой мониторинг ГЧП"
+  description="Еженедельный дайджест новостей по ГЧП и проектному финансированию: ключевые законопроекты, сделки, судебная практика и аналитика из профильных источников."
+>
+  <h1>Новости</h1>
+  <p class="subtitle" style="color: var(--text-muted); margin-top: 0.5rem;">
+    Еженедельный дайджест ключевых событий в сфере ГЧП и проектного финансирования.
+  </p>
+
+  {years.length === 0 ? (
+    <div class="callout"><p>Дайджесты скоро появятся.</p></div>
+  ) : (
+    <>
+      {years.length > 1 && (
+        <nav class="anchor-nav">
+          {years.map((y) => <a href={`#y${y}`}>{y}</a>)}
+        </nav>
+      )}
+
+      {years.map((year) => {
+        const list = byYear.get(year)!;
+        return (
+          <details class="year-block" id={`y${year}`} open={year === currentYear}>
+            <summary>
+              <h2 class="year-heading">{year}</h2>
+              <span class="year-count">{list.length}&nbsp;{plural(list.length, ['выпуск', 'выпуска', 'выпусков'])}</span>
+            </summary>
+            <ul class="monitoring-list">
+              {list.map((r) => (
+                <li>
+                  <a href={`/news/${r.slug}/`}>{cleanPeriod(r.period)}</a>
+                  {r.tgId != null && (
+                    <a class="release-tg" href={`https://t.me/pmgchp/${r.tgId}`} target="_blank" rel="noopener" title="Выпуск в Telegram">TG ↗</a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </details>
+        );
+      })}
+    </>
+  )}
+
+  <script is:inline>
+    // Якоря в навигации раскрывают свёрнутый год архива
+    (function () {
+      function openTarget() {
+        var h = location.hash;
+        if (!h) return;
+        var el = document.querySelector(h);
+        if (el && el.tagName === 'DETAILS') el.open = true;
+      }
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('a[href^="#y"]');
+        if (!a) return;
+        var el = document.querySelector(a.getAttribute('href'));
+        if (el && el.tagName === 'DETAILS') el.open = true;
+      });
+      window.addEventListener('hashchange', openTarget);
+      openTarget();
+    })();
+  </script>
+</Base>

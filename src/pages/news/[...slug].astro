@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const releases = await getCollection('news');
+  return releases.map((r) => ({
+    params: { slug: r.id },
+    props: { release: r },
+  }));
+}
+
+const { release } = Astro.props;
+const { Content } = await render(release);
+
+const formatDate = (d: Date) =>
+  d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<Base
+  title={`${release.data.title} — Правовой мониторинг ГЧП`}
+  description={`Дайджест новостей ГЧП и проектного финансирования за ${release.data.period}: ключевые законопроекты, сделки, судебная практика и аналитика.`}
+  ogType="article"
+  publishDate={release.data.date}
+>
+  <article>
+    <header class="article-header">
+      <p class="post-date">{formatDate(release.data.date)}</p>
+      <h1>{release.data.title}</h1>
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+  <p style="margin-top: 3rem;"><a href="/news/">← Все новости</a></p>
+</Base>
