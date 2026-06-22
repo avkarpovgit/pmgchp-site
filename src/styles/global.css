@@ -339,7 +339,7 @@ main {
   }
 }
 
-/* Карточка «Мониторинг» с под-ссылками трекеров (законопроекты, акты в силе) */
+/* Карточка «Мониторинг» с под-ссылками трекеров (проекты НПА, акты в силе) */
 .section-card h3 a {
   color: inherit;
   text-decoration: none;
@@ -562,7 +562,7 @@ main {
   margin-bottom: 0.25rem;
 }
 
-/* Monitoring: подразделы (законопроекты, ожидающие вступления в силу) */
+/* Monitoring: подразделы (проекты НПА, ожидающие вступления в силу) */
 .mon-block {
   margin: 1.2rem 0 2.6rem;
 }
@@ -573,14 +573,14 @@ main {
   margin: 0.2rem 0 1.1rem;
 }
 
-/* Законопроекты */
-.bills-list {
+/* Проекты НПА */
+.drafts-list {
   list-style: none;
   padding-left: 0;
   margin: 0;
 }
 
-.bill-item {
+.draft-item {
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
@@ -589,7 +589,7 @@ main {
   margin-bottom: 1rem;
 }
 
-.bill-head {
+.draft-head {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -597,7 +597,7 @@ main {
   margin-bottom: 0.45rem;
 }
 
-.bill-status {
+.draft-status {
   display: inline-block;
   padding: 0.13rem 0.6rem;
   border-radius: 99px;
@@ -608,37 +608,37 @@ main {
   letter-spacing: 0.01em;
 }
 
-.bill-number {
+.draft-meta {
   color: var(--text-muted);
   font-size: 0.84rem;
 }
 
-.bill-title {
+.draft-title {
   margin: 0 0 0.6rem;
   font-size: 1.05rem;
   line-height: 1.4;
 }
 
-.bill-links {
+.draft-links {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem 1.1rem;
 }
 
-.bill-link {
+.draft-link {
   font-size: 0.86rem;
   border-bottom: none;
   white-space: nowrap;
 }
 
-.bill-body {
+.draft-body {
   margin-top: 0.7rem;
   font-size: 0.93rem;
   color: var(--text-muted);
 }
 
-.bill-body p { margin: 0 0 0.7rem; }
-.bill-body p:last-child { margin-bottom: 0; }
+.draft-body p { margin: 0 0 0.7rem; }
+.draft-body p:last-child { margin-bottom: 0; }
 
 /* Акты, ожидающие вступления в силу */
 .pending-list {
@@ -753,7 +753,7 @@ main {
   font-weight: normal;
 }
 
-/* История прохождения законопроекта */
+/* История прохождения проекта НПА */
 .stage-list {
   margin: 0.5rem 0 0.3rem;
   padding-left: 1.3rem;

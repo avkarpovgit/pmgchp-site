@@ -6,7 +6,7 @@
 ~февраль 2025 (законов 2026 г. там нет). СОЗД же — живой server-rendered HTML
 без токена/Referer/прокси.
 
-Для каждого файла src/content/bills/*.md берёт номер законопроекта (`number`),
+Для каждого файла src/content/drafts/*.md берёт номер законопроекта (`number`),
 скачивает sozd.duma.gov.ru/bill/<number>, определяет текущую стадию как самое
 продвинутое ДАТИРОВАННОЕ решение из хронологии и, если стадия изменилась,
 обновляет поле `status` и дописывает запись в историю `stages`.
@@ -20,7 +20,7 @@ Fail-safe: сеть/парсинг/без PyYAML → файл НЕ меняет�
 падает). `status` всегда можно поправить вручную. Если СОЗД когда-нибудь
 заблокирует раннер — задайте секрет DUMA_PROXY (http-прокси с РФ-IP).
 
-Запуск:  python3 scripts/update_bills.py [--selftest]
+Запуск:  python3 scripts/update_drafts.py [--selftest]
 Селф-тест проверяет detect_status на фикстуре, сеть/PyYAML не нужны.
 """
 import os
@@ -37,7 +37,7 @@ try:
 except ImportError:
     yaml = None
 
-BILLS_DIR = pathlib.Path(__file__).parent.parent / "src" / "content" / "bills"
+DRAFTS_DIR = pathlib.Path(__file__).parent.parent / "src" / "content" / "drafts"
 SOZD_URL = "https://sozd.duma.gov.ru/bill/{number}"
 
 # Решения из хронологии СОЗД от наиболее продвинутого к наименее. Подпись —
@@ -159,13 +159,13 @@ def main():
     if yaml is None:
         print("PyYAML не установлен — обновление статусов пропущено")
         return 0
-    if not BILLS_DIR.exists():
+    if not DRAFTS_DIR.exists():
         print("каталог законопроектов не найден — пропуск")
         return 0
     if os.environ.get("DUMA_PROXY"):
         print("используется прокси DUMA_PROXY")
     today = datetime.date.today()
-    files = sorted(BILLS_DIR.glob("*.md"))
+    files = sorted(DRAFTS_DIR.glob("*.md"))
     print(f"законопроектов: {len(files)}")
     changed = 0
     for f in files:

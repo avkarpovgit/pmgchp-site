@@ -6,7 +6,7 @@ import { cleanPeriod, getPendingActs, plural, getMonitoringByYear } from '../uti
 const { years, byYear } = await getMonitoringByYear();
 const recent = years.flatMap((y) => byYear.get(y)!).slice(0, 6);
 
-const billsCount = (await getCollection('bills', ({ data }) => !data.draft)).length;
+const draftsCount = (await getCollection('drafts', ({ data }) => !data.hidden)).length;
 const pendingCount = (await getPendingActs()).length;
 ---
 
@@ -21,10 +21,10 @@ const pendingCount = (await getPendingActs()).length;
   </p>
 
   <div class="watch-teasers">
-    <a class="watch-teaser" href="/monitoring/bills/">
-      <span class="watch-teaser-label">Отслеживаем законопроекты</span>
+    <a class="watch-teaser" href="/monitoring/drafts/">
+      <span class="watch-teaser-label">Отслеживаем проекты НПА</span>
       <span class="watch-teaser-count">
-        {billsCount}&nbsp;{plural(billsCount, ['проект', 'проекта', 'проектов'])} на рассмотрении&nbsp;→
+        {draftsCount}&nbsp;{plural(draftsCount, ['проект', 'проекта', 'проектов'])} в работе&nbsp;→
       </span>
     </a>
     <a class="watch-teaser" href="/monitoring/pending/">

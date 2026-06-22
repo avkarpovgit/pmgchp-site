@@ -35,20 +35,23 @@ const news = defineCollection({
   }),
 });
 
-const bills = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/bills' }),
+// Проекты НПА: законопроекты Госдумы, проекты подзаконных актов, указаний ЦБ и т.п.
+const drafts = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/drafts' }),
   schema: z.object({
-    number: z.string(),                       // номер законопроекта, напр. "1254383-8"
+    kind: z.string().default('Проект НПА'),    // тип: «Законопроект», «Проект Указания Банка России», …
+    number: z.string().optional(),             // номер законопроекта Госдумы, напр. "1254383-8" (если есть)
     title: z.string(),
     date: z.coerce.date(),                     // дата состояния текста / внесения
     status: z.string().default('На рассмотрении'),
     sozd: z.string().url().optional(),         // паспорт на сайте Госдумы (sozd.duma.gov.ru)
     consultant: z.string().url().optional(),   // текст проекта в КонсультантПлюс
     passport: z.string().url().optional(),     // паспорт проекта в КонсультантПлюс
-    // история прохождения: обновляется скриптом scripts/update_bills.py по СОЗД
+    source: z.string().url().optional(),       // страница проекта (cbr.ru, regulation.gov.ru и т.п.)
+    // история прохождения: для законопроектов обновляется скриптом scripts/update_drafts.py по СОЗД
     stages: z.array(z.object({ stage: z.string(), date: z.coerce.date() })).default([]),
-    draft: z.boolean().default(false),
+    hidden: z.boolean().default(false),        // скрыть из публикации (черновик карточки)
   }),
 });
 
-export const collections = { blog, monitoring, news, bills };
+export const collections = { blog, monitoring, news, drafts };

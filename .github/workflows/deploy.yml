@@ -37,13 +37,13 @@ jobs:
           DUMA_PROXY: ${{ secrets.DUMA_PROXY }}
         run: |
           python3 -m pip install --quiet --user pyyaml || true
-          python3 scripts/update_bills.py --selftest
-          python3 scripts/update_bills.py || echo "::warning::update_bills.py: статусы законопроектов с СОЗД не обновлены (источник недоступен или не распознан)"
-          if ! git diff --quiet src/content/bills/; then
+          python3 scripts/update_drafts.py --selftest
+          python3 scripts/update_drafts.py || echo "::warning::update_drafts.py: статусы законопроектов с СОЗД не обновлены (источник недоступен или не распознан)"
+          if ! git diff --quiet src/content/drafts/; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add src/content/bills/
-            git commit -m "Законопроекты: обновление статусов с СОЗД (авто)"
+            git add src/content/drafts/
+            git commit -m "Проекты НПА: обновление статусов законопроектов с СОЗД (авто)"
             git push
           fi
 
