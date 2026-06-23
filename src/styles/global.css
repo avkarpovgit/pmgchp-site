@@ -666,10 +666,34 @@ main {
   letter-spacing: 0.05em;
   color: var(--text-muted);
 }
-.summary-group ul { margin: 0; padding-left: 1.1rem; }
+.summary-group ul { margin: 0; padding-left: 0; list-style: none; }
 .summary-group li { margin: 0.25rem 0; font-size: 0.92rem; line-height: 1.45; }
+.summary-no { color: var(--text); font-weight: 700; margin-right: 0.1rem; }
+.draft-no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  color: var(--accent-dark);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
 .summary-kind { font-weight: 600; color: var(--text); white-space: nowrap; }
 .summary-num { color: var(--text-muted); font-size: 0.84rem; white-space: nowrap; }
+
+/* Тематические заголовки основного списка карточек (как группы в обзоре) */
+.drafts-topic {
+  margin: 2.2rem 0 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--border);
+  font-size: 1.2rem;
+  color: var(--text);
+}
+.drafts-topic-group:first-of-type .drafts-topic { margin-top: 1.4rem; }
 
 /* Акты, ожидающие вступления в силу */
 .pending-list {

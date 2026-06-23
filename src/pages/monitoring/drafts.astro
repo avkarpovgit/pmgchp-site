@@ -68,6 +68,12 @@ const summaryTopics = [
   ...[...byTopic.keys()].filter((t) => !TOPIC_ORDER.includes(t)),
 ];
 
+// Сквозная нумерация в порядке отображения (группы → внутри группы по юр. силе);
+// одинаковая в обзоре и в карточках, чтобы можно было ссылаться «4-й проект на странице».
+const numById = new Map(
+  summaryTopics.flatMap((t) => byTopic.get(t)!).map((d, i) => [d.id, i + 1]),
+);
+
 const formatDate = (d: Date) =>
   d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
@@ -97,6 +103,7 @@ const formatDate = (d: Date) =>
               const text = (d.data.summary ?? d.data.title).replace(/\.+$/, '');
               return (
                 <li>
+                  <span class="summary-no">{numById.get(d.id)}.</span>{' '}
                   <span class="summary-kind">{actMeta(d.data.kind).short}</span>
                   {' — '}
                   <a href={`#${d.id}`}>{text}</a>
@@ -113,16 +120,21 @@ const formatDate = (d: Date) =>
   {drafts.length === 0 ? (
     <div class="callout"><p>Сейчас отслеживаемых проектов НПА нет.</p></div>
   ) : (
-    <ul class="drafts-list">
-      {drafts.map((d) => {
-        const ref = refNum(d.data);
-        return (
+    <Fragment>
+      {summaryTopics.map((t) => (
+        <section class="drafts-topic-group">
+          <h2 class="drafts-topic">{t}</h2>
+          <ul class="drafts-list">
+            {byTopic.get(t)!.map((d) => {
+              const ref = refNum(d.data);
+              return (
         <li class="draft-item" id={d.id}>
           <div class="draft-head">
+            <span class="draft-no">{numById.get(d.id)}</span>
             <span class="draft-status">{d.data.status}</span>
             <span class="draft-meta">{d.data.kind}{ref ? ` · ${ref.mark} ${ref.value}` : ''}</span>
           </div>
-          <h2 class="draft-title">{d.data.title}</h2>
+          <h3 class="draft-title">{d.data.title}</h3>
           <div class="draft-links">
             {d.data.sozd && <a class="draft-link" href={d.data.sozd} target="_blank" rel="noopener">Паспорт на сайте Госдумы&nbsp;↗</a>}
             {d.data.source && <a class="draft-link" href={d.data.source} target="_blank" rel="noopener">{d.data.source.includes('regulation.gov.ru') ? 'Страница проекта на regulation' : 'Страница проекта'}&nbsp;↗</a>}
@@ -144,9 +156,12 @@ const formatDate = (d: Date) =>
             </details>
           )}
         </li>
-        );
-      })}
-    </ul>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
+    </Fragment>
   )}
 
   <p style="margin-top: 3rem;"><a href="/monitoring/">← Назад к мониторингу</a></p>
