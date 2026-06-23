@@ -42,6 +42,8 @@ const drafts = defineCollection({
     kind: z.string().default('Проект НПА'),    // тип: «Законопроект», «Проект Указания Банка России», …
     number: z.string().optional(),             // номер законопроекта Госдумы, напр. "1254383-8" (если есть)
     title: z.string(),
+    summary: z.string().optional(),            // одна строка для обзора в начале раздела (чему посвящён проект)
+    topic: z.string().default('Прочее'),       // тематическая группа для обзора (см. TOPIC_ORDER в drafts.astro)
     date: z.coerce.date(),                     // дата состояния текста / внесения
     status: z.string().default('На рассмотрении'),
     sozd: z.string().url().optional(),         // паспорт на сайте Госдумы (sozd.duma.gov.ru)

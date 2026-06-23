@@ -640,6 +640,37 @@ main {
 .draft-body p { margin: 0 0 0.7rem; }
 .draft-body p:last-child { margin-bottom: 0; }
 
+.draft-item { scroll-margin-top: 1.5rem; }
+
+/* Краткий обзор отслеживаемых проектов в начале раздела */
+.drafts-summary {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.2rem 0.6rem;
+  margin: 1.4rem 0 2rem;
+}
+.drafts-summary > h2 { margin: 0 0 0.3rem; font-size: 1.1rem; }
+.drafts-summary-intro {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 0.9rem;
+}
+.summary-group { margin-bottom: 0.9rem; }
+.summary-group:last-child { margin-bottom: 0.3rem; }
+.summary-group h3 {
+  margin: 0 0 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.summary-group ul { margin: 0; padding-left: 1.1rem; }
+.summary-group li { margin: 0.25rem 0; font-size: 0.92rem; line-height: 1.45; }
+.summary-kind { font-weight: 600; color: var(--text); white-space: nowrap; }
+.summary-num { color: var(--text-muted); font-size: 0.84rem; white-space: nowrap; }
+
 /* Акты, ожидающие вступления в силу */
 .pending-list {
   list-style: none;

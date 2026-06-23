@@ -5,8 +5,60 @@ import { getCollection, render } from 'astro:content';
 const draftEntries = (await getCollection('drafts', ({ data }) => !data.hidden))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const drafts = await Promise.all(
-  draftEntries.map(async (d) => ({ data: d.data, Content: (await render(d)).Content })),
+  draftEntries.map(async (d) => ({ id: d.id, data: d.data, Content: (await render(d)).Content })),
 );
+
+// Тип акта → короткая метка + ранг юридической силы (меньше = выше сила, идёт первым):
+// закон/законопроект → постановление Правительства → приказ министерства → указание Банка России.
+function actMeta(kind: string): { rank: number; short: string } {
+  const k = kind.toLowerCase();
+  if (k.includes('закон')) return { rank: 1, short: 'Законопроект' };
+  if (k.includes('постановлени')) return { rank: 2, short: 'ПП РФ' };
+  if (k.includes('приказ')) {
+    let short = 'Приказ';
+    if (k.includes('минэконом')) short = 'Приказ МЭР';
+    else if (k.includes('минфин')) short = 'Приказ Минфина';
+    else if (k.includes('минстро')) short = 'Приказ Минстроя';
+    else if (k.includes('минтранс')) short = 'Приказ Минтранса';
+    return { rank: 3, short };
+  }
+  if (k.includes('указани')) return { rank: 4, short: 'Указание ЦБ' };
+  return { rank: 5, short: kind };
+}
+
+// Номер проекта подзаконного акта на regulation.gov.ru (из ссылки source) — по аналогии с номером законопроекта
+function regNum(source?: string): string | null {
+  const m = source?.match(/regulation\.gov\.ru\/projects\/(\d+)/);
+  return m ? m[1] : null;
+}
+
+// Тематические группы для краткого обзора в начале раздела (порядок отображения)
+const TOPIC_ORDER = [
+  'Концессии и ГЧП',
+  'Финансирование',
+  'Бюджет',
+  'СЗПК',
+  'Офсет',
+  'Иное',
+];
+const byTopic = new Map<string, typeof drafts>();
+for (const d of drafts) {
+  const t = d.data.topic ?? 'Прочее';
+  if (!byTopic.has(t)) byTopic.set(t, []);
+  byTopic.get(t)!.push(d);
+}
+// Внутри группы — по юридической силе, затем по дате (свежие выше)
+for (const arr of byTopic.values()) {
+  arr.sort(
+    (a, b) =>
+      actMeta(a.data.kind).rank - actMeta(b.data.kind).rank ||
+      b.data.date.valueOf() - a.data.date.valueOf(),
+  );
+}
+const summaryTopics = [
+  ...TOPIC_ORDER.filter((t) => byTopic.has(t)),
+  ...[...byTopic.keys()].filter((t) => !TOPIC_ORDER.includes(t)),
+];
 
 const formatDate = (d: Date) =>
   d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -22,12 +74,40 @@ const formatDate = (d: Date) =>
     законопроекты Госдумы, проекты постановлений Правительства, указаний Банка России и иных подзаконных актов.
   </p>
 
+  {drafts.length > 0 && (
+    <section class="drafts-summary">
+      <h2>Актуальные проекты ({drafts.length})</h2>
+      <p class="drafts-summary-intro">
+        Кратко — чему посвящены изменения. Полное описание, статус прохождения и ссылки — в карточках ниже.
+      </p>
+      {summaryTopics.map((t) => (
+        <div class="summary-group">
+          <h3>{t}</h3>
+          <ul>
+            {byTopic.get(t)!.map((d) => {
+              const num = d.data.number ?? regNum(d.data.source);
+              const text = (d.data.summary ?? d.data.title).replace(/\.+$/, '');
+              return (
+                <li>
+                  <span class="summary-kind">{actMeta(d.data.kind).short}</span>
+                  {' — '}
+                  <a href={`#${d.id}`}>{text}</a>
+                  {num && <span class="summary-num"> · № {num}</span>}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </section>
+  )}
+
   {drafts.length === 0 ? (
     <div class="callout"><p>Сейчас отслеживаемых проектов НПА нет.</p></div>
   ) : (
     <ul class="drafts-list">
       {drafts.map((d) => (
-        <li class="draft-item">
+        <li class="draft-item" id={d.id}>
           <div class="draft-head">
             <span class="draft-status">{d.data.status}</span>
             <span class="draft-meta">{d.data.kind}{d.data.number ? ` · № ${d.data.number}` : ''}</span>
@@ -35,11 +115,14 @@ const formatDate = (d: Date) =>
           <h2 class="draft-title">{d.data.title}</h2>
           <div class="draft-links">
             {d.data.sozd && <a class="draft-link" href={d.data.sozd} target="_blank" rel="noopener">Паспорт на сайте Госдумы&nbsp;↗</a>}
-            {d.data.source && <a class="draft-link" href={d.data.source} target="_blank" rel="noopener">Страница проекта&nbsp;↗</a>}
-            {d.data.consultant && <a class="draft-link" href={d.data.consultant} target="_blank" rel="noopener">Текст проекта&nbsp;↗</a>}
+            {d.data.source && <a class="draft-link" href={d.data.source} target="_blank" rel="noopener">{d.data.source.includes('regulation.gov.ru') ? 'Страница проекта на regulation' : 'Страница проекта'}&nbsp;↗</a>}
+            {d.data.consultant && <a class="draft-link" href={d.data.consultant} target="_blank" rel="noopener">{d.data.consultant.includes('consultant.ru') ? 'Текст проекта (КонсультантПлюс)' : 'Текст проекта'}&nbsp;↗</a>}
             {d.data.passport && <a class="draft-link" href={d.data.passport} target="_blank" rel="noopener">Паспорт (КонсультантПлюс)&nbsp;↗</a>}
           </div>
-          <div class="draft-body"><d.Content /></div>
+          <details class="release-details draft-desc">
+            <summary>Описание</summary>
+            <div class="draft-body"><d.Content /></div>
+          </details>
           {d.data.stages && d.data.stages.length > 0 && (
             <details class="release-details draft-history">
               <summary>История прохождения ({d.data.stages.length})</summary>
