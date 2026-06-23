@@ -41,6 +41,7 @@ const drafts = defineCollection({
   schema: z.object({
     kind: z.string().default('Проект НПА'),    // тип: «Законопроект», «Проект Указания Банка России», …
     number: z.string().optional(),             // номер законопроекта Госдумы, напр. "1254383-8" (если есть)
+    regId: z.string().optional(),              // полный ID проекта НПА на regulation.gov.ru, напр. "01/01/02-26/00164852"
     title: z.string(),
     summary: z.string().optional(),            // одна строка для обзора в начале раздела (чему посвящён проект)
     topic: z.string().default('Прочее'),       // тематическая группа для обзора (см. TOPIC_ORDER в drafts.astro)

@@ -32,6 +32,14 @@ function regNum(source?: string): string | null {
   return m ? m[1] : null;
 }
 
+// Подпись номера: думский — «№ 1040369-8», подзаконный — «ID 01/01/02-26/00164852»
+// (полный regId, иначе короткий id из ссылки source). Разные метки, чтобы не путать с СОЗД.
+function refNum(data: { number?: string; regId?: string; source?: string }): { mark: string; value: string } | null {
+  if (data.number) return { mark: '№', value: data.number };
+  const reg = data.regId ?? regNum(data.source);
+  return reg ? { mark: 'ID', value: reg } : null;
+}
+
 // Тематические группы для краткого обзора в начале раздела (порядок отображения)
 const TOPIC_ORDER = [
   'Концессии и ГЧП',
@@ -85,14 +93,14 @@ const formatDate = (d: Date) =>
           <h3>{t}</h3>
           <ul>
             {byTopic.get(t)!.map((d) => {
-              const num = d.data.number ?? regNum(d.data.source);
+              const ref = refNum(d.data);
               const text = (d.data.summary ?? d.data.title).replace(/\.+$/, '');
               return (
                 <li>
                   <span class="summary-kind">{actMeta(d.data.kind).short}</span>
                   {' — '}
                   <a href={`#${d.id}`}>{text}</a>
-                  {num && <span class="summary-num"> · № {num}</span>}
+                  {ref && <span class="summary-num"> · {ref.mark} {ref.value}</span>}
                 </li>
               );
             })}
@@ -106,11 +114,13 @@ const formatDate = (d: Date) =>
     <div class="callout"><p>Сейчас отслеживаемых проектов НПА нет.</p></div>
   ) : (
     <ul class="drafts-list">
-      {drafts.map((d) => (
+      {drafts.map((d) => {
+        const ref = refNum(d.data);
+        return (
         <li class="draft-item" id={d.id}>
           <div class="draft-head">
             <span class="draft-status">{d.data.status}</span>
-            <span class="draft-meta">{d.data.kind}{d.data.number ? ` · № ${d.data.number}` : ''}</span>
+            <span class="draft-meta">{d.data.kind}{ref ? ` · ${ref.mark} ${ref.value}` : ''}</span>
           </div>
           <h2 class="draft-title">{d.data.title}</h2>
           <div class="draft-links">
@@ -134,7 +144,8 @@ const formatDate = (d: Date) =>
             </details>
           )}
         </li>
-      ))}
+        );
+      })}
     </ul>
   )}
 
