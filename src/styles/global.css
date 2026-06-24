@@ -12,6 +12,9 @@
   --max-width: 760px;
   --font-serif: Georgia, "Times New Roman", serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Семантические алиасы шрифтов (из дизайн-системы): display — серифные заголовки, body — текст */
+  --font-display: var(--font-serif);
+  --font-body: var(--font-sans);
 
   /* Плавная типографика: один диапазон вместо «прыжка» по медиазапросу (база 17px) */
   --fs-h1: clamp(1.7rem, 1.2rem + 2.2vw, 2.1rem);
@@ -125,7 +128,7 @@ html {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-size: 17px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
@@ -137,7 +140,7 @@ body {
 }
 
 h1, h2, h3 {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-weight: 600;
   line-height: 1.25;
 }
@@ -191,7 +194,7 @@ li { margin-bottom: 0.45rem; }
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--text);
@@ -874,7 +877,7 @@ main {
 .cal-monthhead {
   position: relative;
   padding-left: 4.6rem;
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: 1.12rem;
   font-weight: 700;
   color: var(--text);
