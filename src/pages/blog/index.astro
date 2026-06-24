@@ -2,6 +2,9 @@
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { tagSlug } from '../../utils/tags';
+import Callout from '../../components/Callout.astro';
+import PostListItem from '../../components/PostListItem.astro';
+import Tag from '../../components/Tag.astro';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -9,9 +12,6 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
 const tagCounts = new Map<string, number>();
 posts.forEach((p) => p.data.tags.forEach((t: string) => tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1)));
 const allTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
-
-const formatDate = (d: Date) =>
-  d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
 
 <Base title="Блог — Александр Карпов" description="Статьи и обзоры о праве ГЧП, концессиях и проектном финансировании.">
@@ -22,26 +22,22 @@ const formatDate = (d: Date) =>
 
   <div class="tag-cloud">
     {allTags.map(([tag, count]) => (
-      <a class="tag-chip" href={`/blog/tag/${tagSlug(tag)}/`}>{tag} <span>{count}</span></a>
+      <Tag name={tag} href={`/blog/tag/${tagSlug(tag)}/`} count={count} />
     ))}
   </div>
 
   {posts.length === 0 ? (
-    <div class="callout">
+    <Callout>
       <p>
         Здесь скоро появятся развёрнутые материалы. Пока — короткие форматы в телеграм-канале
         <a href="https://t.me/pmgchp" target="_blank" rel="noopener">«Правовой мониторинг ГЧП»</a>
         и посты на <a href="https://boosty.to/avkarpov" target="_blank" rel="noopener">Boosty</a>.
       </p>
-    </div>
+    </Callout>
   ) : (
     <ul class="post-list">
       {posts.map((post) => (
-        <li>
-          <span class="post-date">{formatDate(post.data.date)}</span>
-          <h3><a href={`/blog/${post.id}/`}>{post.data.title}</a></h3>
-          {post.data.description && <p class="excerpt">{post.data.description}</p>}
-        </li>
+        <PostListItem date={post.data.date} href={`/blog/${post.id}/`} title={post.data.title} excerpt={post.data.description} />
       ))}
     </ul>
   )}

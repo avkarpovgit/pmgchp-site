@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
+import Callout from '../../components/Callout.astro';
 
 const draftEntries = (await getCollection('drafts', ({ data }) => !data.hidden))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -118,7 +119,7 @@ const formatDate = (d: Date) =>
   )}
 
   {drafts.length === 0 ? (
-    <div class="callout"><p>Сейчас отслеживаемых проектов НПА нет.</p></div>
+    <Callout><p>Сейчас отслеживаемых проектов НПА нет.</p></Callout>
   ) : (
     <Fragment>
       {summaryTopics.map((t) => (

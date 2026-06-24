@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { cleanPeriod, getPendingActs, plural, getMonitoringByYear } from '../utils/monitoring';
+import WatchTeaser from '../components/WatchTeaser.astro';
 
 const { years, byYear } = await getMonitoringByYear();
 const recent = years.flatMap((y) => byYear.get(y)!).slice(0, 6);
@@ -21,18 +22,12 @@ const pendingCount = (await getPendingActs()).length;
   </p>
 
   <div class="watch-teasers">
-    <a class="watch-teaser" href="/monitoring/drafts/">
-      <span class="watch-teaser-label">Отслеживаем проекты НПА</span>
-      <span class="watch-teaser-count">
-        {draftsCount}&nbsp;{plural(draftsCount, ['актуальный проект', 'актуальных проекта', 'актуальных проектов'])}&nbsp;→
-      </span>
-    </a>
-    <a class="watch-teaser" href="/monitoring/pending/">
-      <span class="watch-teaser-label">Акты, ожидающие вступления в силу</span>
-      <span class="watch-teaser-count">
-        {pendingCount}&nbsp;{plural(pendingCount, ['акт', 'акта', 'актов'])} ещё не в силе&nbsp;→
-      </span>
-    </a>
+    <WatchTeaser href="/monitoring/drafts/" label="Отслеживаем проекты НПА">
+      {draftsCount}&nbsp;{plural(draftsCount, ['актуальный проект', 'актуальных проекта', 'актуальных проектов'])}&nbsp;→
+    </WatchTeaser>
+    <WatchTeaser href="/monitoring/pending/" label="Акты, ожидающие вступления в силу">
+      {pendingCount}&nbsp;{plural(pendingCount, ['акт', 'акта', 'актов'])} ещё не в силе&nbsp;→
+    </WatchTeaser>
   </div>
 
   <h2>Последние выпуски</h2>

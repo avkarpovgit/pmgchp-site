@@ -1,0 +1,20 @@
+---
+// Тег-пилюля. С count — облако тегов; без count — теги статьи.
+interface Props {
+  name: string;
+  href: string;
+  count?: number;
+}
+const { name, href, count } = Astro.props;
+---
+
+<a class="tag-chip" href={href}
+  >{name}{
+    count != null && (
+      <Fragment>
+        {' '}
+        <span>{count}</span>
+      </Fragment>
+    )
+  }</a
+>

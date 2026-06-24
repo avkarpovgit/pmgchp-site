@@ -1,0 +1,37 @@
+---
+// Карточка раздела на главной. Две формы:
+//  - href задан → вся карточка <a> (заголовок без ссылки);
+//  - titleHref задан → <div>, ссылка только на заголовке (+ под-ссылки watch).
+interface WatchLink {
+  label: string;
+  href: string;
+}
+interface Props {
+  title: string;
+  href?: string;
+  titleHref?: string;
+  meta?: string;
+  metaHref?: string;
+  watch?: WatchLink[];
+  class?: string;
+  target?: string;
+  rel?: string;
+}
+const { title, href, titleHref, meta, metaHref, watch, class: cls, target, rel } = Astro.props;
+const Wrapper = href ? 'a' : 'div';
+---
+
+<Wrapper class:list={['section-card', cls]} href={href} target={target} rel={rel}>
+  <h3>{titleHref ? <a href={titleHref}>{title}</a> : title}</h3>
+  <p><slot /></p>
+  {meta && <span class="card-meta">{metaHref ? <a href={metaHref}>{meta}</a> : meta}</span>}
+  {
+    watch && watch.length > 0 && (
+      <div class="card-watch">
+        {watch.map((w) => (
+          <a href={w.href}>{w.label}</a>
+        ))}
+      </div>
+    )
+  }
+</Wrapper>

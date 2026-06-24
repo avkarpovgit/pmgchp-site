@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
 import { tagSlug } from '../../utils/tags';
+import Tag from '../../components/Tag.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -41,7 +42,7 @@ const related = all
       {post.data.tags.length > 0 && (
         <div class="tag-cloud article-tags">
           {post.data.tags.map((tag: string) => (
-            <a class="tag-chip" href={`/blog/tag/${tagSlug(tag)}/`}>{tag}</a>
+            <Tag name={tag} href={`/blog/tag/${tagSlug(tag)}/`} />
           ))}
         </div>
       )}

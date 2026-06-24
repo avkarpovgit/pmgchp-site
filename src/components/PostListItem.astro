@@ -1,0 +1,21 @@
+---
+// Элемент списка записей (блог, страница тега): дата · заголовок-ссылка · аннотация.
+interface Props {
+  date: Date;
+  href: string;
+  title: string;
+  excerpt?: string;
+}
+const { date, href, title, excerpt } = Astro.props;
+const formatted = date.toLocaleDateString('ru-RU', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<li>
+  <span class="post-date">{formatted}</span>
+  <h3><a href={href}>{title}</a></h3>
+  {excerpt && <p class="excerpt">{excerpt}</p>}
+</li>

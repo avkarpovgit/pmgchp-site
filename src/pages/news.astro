@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { cleanPeriod, plural } from '../utils/monitoring';
+import Callout from '../components/Callout.astro';
 
 type Entry = { date: string; period: string; title: string; slug: string; tgId?: number };
 
@@ -35,7 +36,7 @@ const currentYear = years[0];
   </p>
 
   {years.length === 0 ? (
-    <div class="callout"><p>Дайджесты скоро появятся.</p></div>
+    <Callout><p>Дайджесты скоро появятся.</p></Callout>
   ) : (
     <>
       {years.length > 1 && (

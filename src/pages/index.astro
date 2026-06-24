@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import SectionCard from '../components/SectionCard.astro';
 
 const personLd = {
   '@context': 'https://schema.org',
@@ -65,35 +66,31 @@ const siteLd = {
 
   <h2>На сайте</h2>
   <div class="section-cards">
-    <div class="section-card section-card--monitoring">
-      <h3><a href="/monitoring/">Мониторинг</a></h3>
-      <p>Обзоры изменений законодательства в сфере ГЧП с 2020 года</p>
-      <span class="card-meta"><a href="/monitoring/">Все выпуски&nbsp;→</a></span>
-      <div class="card-watch">
-        <a href="/monitoring/drafts/">Проекты НПА&nbsp;→</a>
-        <a href="/monitoring/pending/">Акты, ожидающие вступления в силу&nbsp;→</a>
-      </div>
-    </div>
-    <a class="section-card" href="/news/">
-      <h3>Новости</h3>
-      <p>Еженедельный дайджест событий в сфере ГЧП и проектного финансирования</p>
-      <span class="card-meta">Все выпуски →</span>
-    </a>
-    <a class="section-card" href="/blog/">
-      <h3>Блог</h3>
-      <p>Мои комментарии и мнения по отдельным вопросам</p>
-      <span class="card-meta">Все записи →</span>
-    </a>
-    <a class="section-card" href="https://t.me/pmgchp" target="_blank" rel="noopener">
-      <h3>Telegram-канал</h3>
-      <p>Мониторинг и комментарии в канале с 900+ подписчиков</p>
-      <span class="card-meta">Подписаться ↗</span>
-    </a>
-    <a class="section-card" href="/experience/">
-      <h3>Обо мне</h3>
-      <p>Карьера, преподавание, публикации и профессиональные сообщества</p>
-      <span class="card-meta">Подробнее →</span>
-    </a>
+    <SectionCard
+      title="Мониторинг"
+      titleHref="/monitoring/"
+      meta={"Все выпуски →"}
+      metaHref="/monitoring/"
+      class="section-card--monitoring"
+      watch={[
+        { label: "Проекты НПА →", href: "/monitoring/drafts/" },
+        { label: "Акты, ожидающие вступления в силу →", href: "/monitoring/pending/" },
+      ]}
+    >
+      Обзоры изменений законодательства в сфере ГЧП с 2020 года
+    </SectionCard>
+    <SectionCard href="/news/" title="Новости" meta="Все выпуски →">
+      Еженедельный дайджест событий в сфере ГЧП и проектного финансирования
+    </SectionCard>
+    <SectionCard href="/blog/" title="Блог" meta="Все записи →">
+      Мои комментарии и мнения по отдельным вопросам
+    </SectionCard>
+    <SectionCard href="https://t.me/pmgchp" title="Telegram-канал" meta="Подписаться ↗" target="_blank" rel="noopener">
+      Мониторинг и комментарии в канале с 900+ подписчиков
+    </SectionCard>
+    <SectionCard href="/experience/" title="Обо мне" meta="Подробнее →">
+      Карьера, преподавание, публикации и профессиональные сообщества
+    </SectionCard>
   </div>
 
   <h2>Контакты</h2>

@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getPendingActs } from '../../utils/monitoring';
+import Callout from '../../components/Callout.astro';
 
 const pending = await getPendingActs(); // отсортированы по дате вступления в силу (возр.)
 
@@ -35,7 +36,7 @@ for (const a of pending) {
   </p>
 
   {pending.length === 0 ? (
-    <div class="callout"><p>Сейчас все упомянутые в мониторинге акты уже вступили в силу.</p></div>
+    <Callout><p>Сейчас все упомянутые в мониторинге акты уже вступили в силу.</p></Callout>
   ) : (
     <div class="cal-timeline">
       {rows.map((r) => (
