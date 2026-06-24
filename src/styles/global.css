@@ -1,14 +1,35 @@
 :root {
-  --bg: #fdfcfa;
-  --text: #2b2b2b;
-  --text-muted: #6b6b6b;
+  /* ── Сырой слой палитры (источник истины — global.css + логотип ПМ ГЧП) ── */
+  /* Бренд: плам логотипа + амбер-акцент */
+  --brand-plum: #221426;
+  --brand-plum-700: #2b1b30;
+  --brand-plum-600: #3d2b42;
+  --brand-amber: #f08a3c;
+  /* Тёплые нейтрали (бумага → чернила) */
+  --paper: #fdfcfa;
+  --white: #ffffff;
+  --ink: #2b2b2b;
+  --ink-muted: #6b6b6b;
+  --hairline: #e8e4de;
+  /* Акценты (светлый контекст) */
+  --orange-500: #d4691e;
+  --orange-600: #b85515;
+  /* Приглушённые тёплые статус-тона */
+  --hue-error: #b04a3d;
+  --hue-success: #5d7a52;
+  --hue-warning: #c8821f;
+
+  /* ── Семантические алиасы (по умолчанию — светлая тема) ── */
   /* Контраст: --accent (яркий, ≈3.4:1 на белом) — только крупный текст (≥24px),
      иконки, левый кант, заливки и hover. Ссылки, мелкий и вторичный текст —
      --accent-dark (≈4.6:1, проходит WCAG AA). */
-  --accent: #d4691e;
-  --accent-dark: #b85515;
-  --border: #e8e4de;
-  --card-bg: #ffffff;
+  --bg: var(--paper);
+  --text: var(--ink);
+  --text-muted: var(--ink-muted);
+  --accent: var(--orange-500);
+  --accent-dark: var(--orange-600);
+  --border: var(--hairline);
+  --card-bg: var(--white);
   --max-width: 760px;
   --font-serif: Georgia, "Times New Roman", serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -22,9 +43,9 @@
   --fs-lead: clamp(1.05rem, 0.95rem + 0.7vw, 1.2rem);
 
   /* Токены состояний (приглушённые, тёплые — часть палитры, не «системные») */
-  --error: #b04a3d;
-  --success: #5d7a52;
-  --warning: #c8821f;
+  --error: var(--hue-error);
+  --success: var(--hue-success);
+  --warning: var(--hue-warning);
   --error-bg: #f7ece9;
   --success-bg: #eef2ea;
   --warning-bg: #faf2e2;
@@ -32,7 +53,7 @@
   /* --- Богатые токены дизайн-системы (импорт из Claude Design) --- */
   /* Цвета */
   --border-strong: #d8d2c8;       /* плотнее hairline: разделители, крошки */
-  --accent-contrast: #ffffff;     /* текст на залитом акценте */
+  --accent-contrast: var(--white); /* текст на залитом акценте */
   --link-underline: rgba(212, 105, 30, 0.3);
   --focus-ring: 0 0 0 3px rgba(212, 105, 30, 0.28);
   /* Типографика: шкала кеглей, веса, интерлиньяж, трекинг */
@@ -68,13 +89,13 @@
 /* Тёмная тема: автоматически по системе (если нет ручного выбора) и принудительно по data-theme */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #221426;
+    --bg: var(--brand-plum);
     --text: #ece5dc;
     --text-muted: #a99f95;
-    --accent: #f08a3c;
+    --accent: var(--brand-amber);
     --accent-dark: #e87f2e;
-    --border: #3d2b42;
-    --card-bg: #2b1b30;
+    --border: var(--brand-plum-600);
+    --card-bg: var(--brand-plum-700);
     --error: #d9695b;
     --success: #84a075;
     --warning: #e0a04a;
@@ -82,20 +103,20 @@
     --success-bg: #252a26;
     --warning-bg: #322615;
     --border-strong: #50395a;
-    --accent-contrast: #221426;
+    --accent-contrast: var(--brand-plum);
     --link-underline: rgba(240, 138, 60, 0.32);
     --focus-ring: 0 0 0 3px rgba(240, 138, 60, 0.32);
   }
 }
 
 :root[data-theme="dark"] {
-  --bg: #221426;
+  --bg: var(--brand-plum);
   --text: #ece5dc;
   --text-muted: #a99f95;
-  --accent: #f08a3c;
+  --accent: var(--brand-amber);
   --accent-dark: #e87f2e;
-  --border: #3d2b42;
-  --card-bg: #2b1b30;
+  --border: var(--brand-plum-600);
+  --card-bg: var(--brand-plum-700);
   --error: #d9695b;
   --success: #84a075;
   --warning: #e0a04a;
@@ -103,7 +124,7 @@
   --success-bg: #252a26;
   --warning-bg: #322615;
   --border-strong: #50395a;
-  --accent-contrast: #221426;
+  --accent-contrast: var(--brand-plum);
   --link-underline: rgba(240, 138, 60, 0.32);
   --focus-ring: 0 0 0 3px rgba(240, 138, 60, 0.32);
 }
