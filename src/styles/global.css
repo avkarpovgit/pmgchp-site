@@ -2,6 +2,9 @@
   --bg: #fdfcfa;
   --text: #2b2b2b;
   --text-muted: #6b6b6b;
+  /* Контраст: --accent (яркий, ≈3.4:1 на белом) — только крупный текст (≥24px),
+     иконки, левый кант, заливки и hover. Ссылки, мелкий и вторичный текст —
+     --accent-dark (≈4.6:1, проходит WCAG AA). */
   --accent: #d4691e;
   --accent-dark: #b85515;
   --border: #e8e4de;
@@ -9,6 +12,19 @@
   --max-width: 760px;
   --font-serif: Georgia, "Times New Roman", serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Плавная типографика: один диапазон вместо «прыжка» по медиазапросу (база 17px) */
+  --fs-h1: clamp(1.7rem, 1.2rem + 2.2vw, 2.1rem);
+  --fs-h2: clamp(1.3rem, 1.1rem + 0.9vw, 1.5rem);
+  --fs-lead: clamp(1.05rem, 0.95rem + 0.7vw, 1.2rem);
+
+  /* Токены состояний (приглушённые, тёплые — часть палитры, не «системные») */
+  --error: #b04a3d;
+  --success: #5d7a52;
+  --warning: #c8821f;
+  --error-bg: #f7ece9;
+  --success-bg: #eef2ea;
+  --warning-bg: #faf2e2;
 }
 
 /* Тёмная тема: автоматически по системе (если нет ручного выбора) и принудительно по data-theme */
@@ -21,6 +37,12 @@
     --accent-dark: #e87f2e;
     --border: #3d2b42;
     --card-bg: #2b1b30;
+    --error: #d9695b;
+    --success: #84a075;
+    --warning: #e0a04a;
+    --error-bg: #36202a;
+    --success-bg: #252a26;
+    --warning-bg: #322615;
   }
 }
 
@@ -32,6 +54,12 @@
   --accent-dark: #e87f2e;
   --border: #3d2b42;
   --card-bg: #2b1b30;
+  --error: #d9695b;
+  --success: #84a075;
+  --warning: #e0a04a;
+  --error-bg: #36202a;
+  --success-bg: #252a26;
+  --warning-bg: #322615;
 }
 
 .hero-photo {
@@ -114,8 +142,8 @@ h1, h2, h3 {
   line-height: 1.25;
 }
 
-h1 { font-size: 2.1rem; }
-h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; }
+h1 { font-size: var(--fs-h1); }
+h2 { font-size: var(--fs-h2); margin-top: 2.5rem; margin-bottom: 1rem; }
 h3 { font-size: 1.15rem; margin-top: 1.8rem; margin-bottom: 0.4rem; }
 
 a {
@@ -247,7 +275,7 @@ main {
 }
 
 .hero .subtitle {
-  font-size: 1.2rem;
+  font-size: var(--fs-lead);
   color: var(--text-muted);
   margin-bottom: 1.8rem;
 }
@@ -1004,6 +1032,6 @@ main {
 
 @media (max-width: 600px) {
   body { font-size: 16px; }
-  h1 { font-size: 1.7rem; }
+  /* h1 убран: --fs-h1 clamp() уже сжимает заголовок до 1.7rem на узких экранах */
   main { padding: 2rem 0 3rem; }
 }
