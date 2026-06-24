@@ -23,6 +23,8 @@ const currentPath = Astro.url.pathname;
 const canonicalURL = new URL(currentPath, Astro.site);
 const ogImageURL = new URL(ogImage, Astro.site);
 
+const crumbs = breadcrumb ?? [];
+
 const navItems = [
   { href: '/', label: 'Главная' },
   { href: '/monitoring/', label: 'Мониторинг' },
@@ -134,6 +136,16 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
     </header>
     <main>
       <div class="container">
+        {crumbs.length > 0 && (
+          <nav class="breadcrumbs" aria-label="Хлебные крошки">
+            {crumbs.map((b, i) => (
+              <Fragment>
+                {i > 0 && <span class="sep" aria-hidden="true">→</span>}
+                {i === crumbs.length - 1 ? <span aria-current="page">{b.name}</span> : <a href={b.href}>{b.name}</a>}
+              </Fragment>
+            ))}
+          </nav>
+        )}
         <slot />
       </div>
     </main>
