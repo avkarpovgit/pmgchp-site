@@ -34,6 +34,7 @@
   --border-strong: #d8d2c8;       /* плотнее hairline: разделители, крошки */
   --accent-contrast: #ffffff;     /* текст на залитом акценте */
   --link-underline: rgba(212, 105, 30, 0.3);
+  --focus-ring: 0 0 0 3px rgba(212, 105, 30, 0.28);
   /* Типографика: шкала кеглей, веса, интерлиньяж, трекинг */
   --fs-h3:  1.15rem;
   --fs-sm:  0.92rem;   /* мета, подписи */
@@ -47,6 +48,21 @@
   --lh-body: 1.65;
   --ls-eyebrow: 0.05em;
   --ls-tight: 0.01em;
+
+  /* --- Эффекты (радиусы, бордюры, тени, движение) из дизайн-системы --- */
+  --radius-xs: 6px;     /* callouts, draft-карточки, картинки в prose */
+  --radius-sm: 7px;     /* логотип-чип */
+  --radius-md: 8px;     /* date-пилюли, фото */
+  --radius-lg: 10px;    /* section-карточки */
+  --radius-pill: 99px;  /* nav, теги, бейджи, кнопки */
+  --radius-round: 50%;  /* аватар, draft-нумералы */
+  --border-hairline: 1px solid var(--border);
+  --accent-rule: 3px;                       /* фирменный оранжевый левый кант */
+  --avatar-ring: 3px solid var(--border);
+  --shadow-card: 0 1px 6px rgba(0, 0, 0, 0.08);
+  --shadow-pop: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  --dur-fast: 0.15s;
+  --transition-color: color var(--dur-fast), border-color var(--dur-fast), background-color var(--dur-fast);
 }
 
 /* Тёмная тема: автоматически по системе (если нет ручного выбора) и принудительно по data-theme */
@@ -68,6 +84,7 @@
     --border-strong: #50395a;
     --accent-contrast: #221426;
     --link-underline: rgba(240, 138, 60, 0.32);
+    --focus-ring: 0 0 0 3px rgba(240, 138, 60, 0.32);
   }
 }
 
@@ -88,6 +105,7 @@
   --border-strong: #50395a;
   --accent-contrast: #221426;
   --link-underline: rgba(240, 138, 60, 0.32);
+  --focus-ring: 0 0 0 3px rgba(240, 138, 60, 0.32);
 }
 
 .hero-photo {
@@ -121,14 +139,14 @@
   font-size: 0.88rem;
   color: var(--text-muted);
   text-align: center;
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-pop);
 }
 
 .cookie-notice button {
   margin-left: 0.8rem;
   padding: 0.25rem 0.9rem;
   border: 1px solid var(--accent);
-  border-radius: 99px;
+  border-radius: var(--radius-pill);
   background: none;
   color: var(--accent-dark);
   font-size: var(--fs-xs);
@@ -178,12 +196,24 @@ a {
   color: var(--accent-dark);
   text-decoration: none;
   border-bottom: 1px solid var(--link-underline);
-  transition: border-color 0.15s, color 0.15s;
+  transition: var(--transition-color);
 }
 
 a:hover {
   color: var(--accent);
   border-bottom-color: var(--accent);
+}
+
+/* Видимый фокус для клавиатурной навигации (a11y). Кольцо из --focus-ring
+   наследует радиус элемента; прозрачный outline — для режима forced-colors. */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--focus-ring);
 }
 
 p { margin-bottom: 1rem; }
@@ -229,7 +259,7 @@ li { margin-bottom: 0.45rem; }
 .site-logo {
   width: 28px;
   height: 28px;
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
 }
 
@@ -247,7 +277,7 @@ li { margin-bottom: 0.45rem; }
   border-bottom: none;
   font-size: 0.95rem;
   padding: 0.18rem 0.7rem;
-  border-radius: 99px;
+  border-radius: var(--radius-pill);
 }
 
 .site-nav a:hover {
@@ -320,8 +350,8 @@ main {
   width: 160px;
   height: 160px;
   object-fit: cover;
-  border-radius: 50%;
-  border: 3px solid var(--border);
+  border-radius: var(--radius-round);
+  border: var(--avatar-ring);
 }
 
 @media (max-width: 600px) {
@@ -339,9 +369,9 @@ main {
 /* Cards / callouts */
 .callout {
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: 6px;
+  border: var(--border-hairline);
+  border-left: var(--accent-rule) solid var(--accent);
+  border-radius: var(--radius-xs);
   padding: 1.2rem 1.4rem;
   margin: 2rem 0;
 }
@@ -360,11 +390,11 @@ main {
   display: block;
   padding: 1rem 1.2rem;
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border: var(--border-hairline);
+  border-radius: var(--radius-lg);
   border-bottom: 1px solid var(--border);
   color: var(--text);
-  transition: border-color 0.15s;
+  transition: border-color var(--dur-fast);
 }
 
 .section-card:hover {
@@ -413,7 +443,7 @@ main {
   font-size: var(--fs-xs);
   color: var(--accent-dark);
   text-decoration: none;
-  transition: color 0.15s;
+  transition: color var(--dur-fast);
 }
 .card-watch a:hover {
   text-decoration: underline;
@@ -519,8 +549,8 @@ main {
 .tag-chip {
   display: inline-block;
   padding: 0.18rem 0.65rem;
-  border: 1px solid var(--border);
-  border-radius: 99px;
+  border: var(--border-hairline);
+  border-radius: var(--radius-pill);
   background: var(--card-bg);
   color: var(--text-muted);
   font-size: var(--fs-xs);
@@ -638,9 +668,9 @@ main {
 
 .draft-item {
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: 6px;
+  border: var(--border-hairline);
+  border-left: var(--accent-rule) solid var(--accent);
+  border-radius: var(--radius-xs);
   padding: 1rem 1.2rem;
   margin-bottom: 1rem;
 }
@@ -656,7 +686,7 @@ main {
 .draft-status {
   display: inline-block;
   padding: 0.13rem 0.6rem;
-  border-radius: 99px;
+  border-radius: var(--radius-pill);
   background: var(--accent);
   color: var(--accent-contrast);
   font-size: 0.76rem;
@@ -701,8 +731,8 @@ main {
 /* Краткий обзор отслеживаемых проектов в начале раздела */
 .drafts-summary {
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  border: var(--border-hairline);
+  border-radius: var(--radius-xs);
   padding: 1rem 1.2rem 0.6rem;
   margin: 1.4rem 0 2rem;
 }
@@ -732,7 +762,7 @@ main {
   width: 1.6rem;
   height: 1.6rem;
   flex: 0 0 auto;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   border: 1.5px solid var(--accent);
   color: var(--accent-dark);
   font-size: 0.82rem;
@@ -801,10 +831,10 @@ main {
   flex-direction: column;
   gap: 0.3rem;
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
+  border: var(--border-hairline);
+  border-left: var(--accent-rule) solid var(--accent);
   border-bottom: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   padding: 0.85rem 1.1rem;
 }
 
@@ -938,8 +968,8 @@ main {
   width: 3.4rem;
   text-align: center;
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: var(--border-hairline);
+  border-radius: var(--radius-md);
   padding: 0.3rem 0;
   position: relative;
   z-index: 1;
@@ -1021,7 +1051,7 @@ main {
 .prose img {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   margin: 0.5rem 0;
 }
 
@@ -1037,7 +1067,7 @@ main {
 
 .prose th,
 .prose td {
-  border: 1px solid var(--border);
+  border: var(--border-hairline);
   padding: 0.5rem 0.7rem;
   text-align: left;
   vertical-align: top;
@@ -1065,14 +1095,14 @@ main {
 .pdf-pages img {
   display: block;
   margin: 0.6rem 0;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  border: var(--border-hairline);
+  border-radius: var(--radius-xs);
+  box-shadow: var(--shadow-card);
 }
 
 /* Цитата — фирменный оранжевый кант + серифный шрифт (§5 handoff) */
 .prose blockquote {
-  border-left: 3px solid var(--accent);
+  border-left: var(--accent-rule) solid var(--accent);
   margin: 1.2rem 0;
   padding: 0.3rem 0 0.3rem 1.2rem;
   font-family: var(--font-display);
