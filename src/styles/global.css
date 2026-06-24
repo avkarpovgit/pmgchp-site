@@ -28,6 +28,25 @@
   --error-bg: #f7ece9;
   --success-bg: #eef2ea;
   --warning-bg: #faf2e2;
+
+  /* --- Богатые токены дизайн-системы (импорт из Claude Design) --- */
+  /* Цвета */
+  --border-strong: #d8d2c8;       /* плотнее hairline: разделители, крошки */
+  --accent-contrast: #ffffff;     /* текст на залитом акценте */
+  --link-underline: rgba(212, 105, 30, 0.3);
+  /* Типографика: шкала кеглей, веса, интерлиньяж, трекинг */
+  --fs-h3:  1.15rem;
+  --fs-sm:  0.92rem;   /* мета, подписи */
+  --fs-xs:  0.85rem;   /* теги, даты, крошки */
+  --fs-2xs: 0.78rem;   /* eyebrow / капс-лейблы */
+  --fw-regular: 400;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --lh-tight: 1.25;
+  --lh-snug: 1.4;
+  --lh-body: 1.65;
+  --ls-eyebrow: 0.05em;
+  --ls-tight: 0.01em;
 }
 
 /* Тёмная тема: автоматически по системе (если нет ручного выбора) и принудительно по data-theme */
@@ -46,6 +65,9 @@
     --error-bg: #36202a;
     --success-bg: #252a26;
     --warning-bg: #322615;
+    --border-strong: #50395a;
+    --accent-contrast: #221426;
+    --link-underline: rgba(240, 138, 60, 0.32);
   }
 }
 
@@ -63,6 +85,9 @@
   --error-bg: #36202a;
   --success-bg: #252a26;
   --warning-bg: #322615;
+  --border-strong: #50395a;
+  --accent-contrast: #221426;
+  --link-underline: rgba(240, 138, 60, 0.32);
 }
 
 .hero-photo {
@@ -106,13 +131,13 @@
   border-radius: 99px;
   background: none;
   color: var(--accent-dark);
-  font-size: 0.85rem;
+  font-size: var(--fs-xs);
   cursor: pointer;
 }
 
 .cookie-notice button:hover {
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-contrast);
 }
 
 * {
@@ -130,7 +155,7 @@ body {
   color: var(--text);
   font-family: var(--font-body);
   font-size: 17px;
-  line-height: 1.65;
+  line-height: var(--lh-body);
   -webkit-font-smoothing: antialiased;
   overflow-wrap: break-word;
 }
@@ -141,18 +166,18 @@ body {
 
 h1, h2, h3 {
   font-family: var(--font-display);
-  font-weight: 600;
-  line-height: 1.25;
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
 }
 
 h1 { font-size: var(--fs-h1); }
 h2 { font-size: var(--fs-h2); margin-top: 2.5rem; margin-bottom: 1rem; }
-h3 { font-size: 1.15rem; margin-top: 1.8rem; margin-bottom: 0.4rem; }
+h3 { font-size: var(--fs-h3); margin-top: 1.8rem; margin-bottom: 0.4rem; }
 
 a {
   color: var(--accent-dark);
   text-decoration: none;
-  border-bottom: 1px solid rgba(212, 105, 30, 0.3);
+  border-bottom: 1px solid var(--link-underline);
   transition: border-color 0.15s, color 0.15s;
 }
 
@@ -196,7 +221,7 @@ li { margin-bottom: 0.45rem; }
   gap: 0.55rem;
   font-family: var(--font-display);
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   color: var(--text);
   border-bottom: none;
 }
@@ -231,13 +256,13 @@ li { margin-bottom: 0.45rem; }
 }
 
 .site-nav a[aria-current="page"] {
-  color: #fff;
+  color: var(--accent-contrast);
   background: var(--accent);
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
 }
 
 .site-nav a[aria-current="page"]:hover {
-  color: #fff;
+  color: var(--accent-contrast);
   background: var(--accent-dark);
 }
 
@@ -355,12 +380,12 @@ main {
 
 .section-card p {
   margin: 0 0 0.5rem;
-  font-size: 0.92rem;
+  font-size: var(--fs-sm);
   color: var(--text-muted);
 }
 
 .section-card .card-meta {
-  font-size: 0.85rem;
+  font-size: var(--fs-xs);
   color: var(--accent-dark);
 }
 
@@ -385,7 +410,7 @@ main {
   margin-top: 0.5rem;
 }
 .card-watch a {
-  font-size: 0.85rem;
+  font-size: var(--fs-xs);
   color: var(--accent-dark);
   text-decoration: none;
   transition: color 0.15s;
@@ -415,7 +440,7 @@ main {
   display: inline-block;
   min-width: 7.5rem;
   color: var(--text-muted);
-  font-size: 0.92rem;
+  font-size: var(--fs-sm);
 }
 
 /* Experience entries */
@@ -425,7 +450,7 @@ main {
 
 .entry .meta {
   color: var(--text-muted);
-  font-size: 0.92rem;
+  font-size: var(--fs-sm);
   margin-bottom: 0.6rem;
 }
 
@@ -498,7 +523,7 @@ main {
   border-radius: 99px;
   background: var(--card-bg);
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: var(--fs-xs);
   border-bottom: 1px solid var(--border);
 }
 
@@ -509,7 +534,7 @@ main {
 
 .tag-chip span {
   opacity: 0.6;
-  font-size: 0.78rem;
+  font-size: var(--fs-2xs);
 }
 
 .article-tags {
@@ -556,7 +581,7 @@ main {
 
 .release-tg {
   color: var(--text-muted);
-  font-size: 0.78rem;
+  font-size: var(--fs-2xs);
   margin-left: 0.55rem;
   border-bottom: none;
   opacity: 0.7;
@@ -574,7 +599,7 @@ main {
 .release-details summary {
   cursor: pointer;
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: var(--fs-xs);
   user-select: none;
 }
 
@@ -633,10 +658,10 @@ main {
   padding: 0.13rem 0.6rem;
   border-radius: 99px;
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-contrast);
   font-size: 0.76rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
 }
 
 .draft-meta {
@@ -647,7 +672,7 @@ main {
 .draft-title {
   margin: 0 0 0.6rem;
   font-size: 1.05rem;
-  line-height: 1.4;
+  line-height: var(--lh-snug);
 }
 
 .draft-links {
@@ -691,15 +716,15 @@ main {
 .summary-group:last-child { margin-bottom: 0.3rem; }
 .summary-group h3 {
   margin: 0 0 0.3rem;
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-bold);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--ls-eyebrow);
   color: var(--text-muted);
 }
 .summary-group ul { margin: 0; padding-left: 0; list-style: none; }
-.summary-group li { margin: 0.25rem 0; font-size: 0.92rem; line-height: 1.45; }
-.summary-no { color: var(--text); font-weight: 700; margin-right: 0.1rem; }
+.summary-group li { margin: 0.25rem 0; font-size: var(--fs-sm); line-height: 1.45; }
+.summary-no { color: var(--text); font-weight: var(--fw-bold); margin-right: 0.1rem; }
 .draft-no {
   display: inline-flex;
   align-items: center;
@@ -711,9 +736,9 @@ main {
   border: 1.5px solid var(--accent);
   color: var(--accent-dark);
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
 }
-.summary-kind { font-weight: 600; color: var(--text); white-space: nowrap; }
+.summary-kind { font-weight: var(--fw-semibold); color: var(--text); white-space: nowrap; }
 .summary-num { color: var(--text-muted); font-size: 0.84rem; white-space: nowrap; }
 
 /* Тематические заголовки основного списка карточек (как группы в обзоре) */
@@ -741,7 +766,7 @@ main {
 .pending-date {
   display: inline-block;
   min-width: 9.5rem;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
   color: var(--accent-dark);
   font-size: 0.9rem;
   margin-right: 0.5rem;
@@ -790,7 +815,7 @@ main {
 
 .watch-teaser-label {
   color: var(--text);
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
   font-size: 0.97rem;
 }
 
@@ -835,15 +860,15 @@ main {
 
 .year-count {
   color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: normal;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-regular);
 }
 
 /* История прохождения проекта НПА */
 .stage-list {
   margin: 0.5rem 0 0.3rem;
   padding-left: 1.3rem;
-  font-size: 0.92rem;
+  font-size: var(--fs-sm);
   color: var(--text-muted);
 }
 
@@ -853,7 +878,7 @@ main {
 
 .stage-date {
   color: var(--accent-dark);
-  font-size: 0.85rem;
+  font-size: var(--fs-xs);
   margin-right: 0.4rem;
 }
 
@@ -879,7 +904,7 @@ main {
   padding-left: 4.6rem;
   font-family: var(--font-display);
   font-size: 1.12rem;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   color: var(--text);
   margin: 1.7rem 0 0.6rem;
 }
@@ -923,7 +948,7 @@ main {
 .cal-day {
   display: block;
   font-size: 1.45rem;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   line-height: 1.05;
   color: var(--text);
 }
@@ -945,7 +970,7 @@ main {
 .cal-title {
   display: block;
   font-size: 1rem;
-  line-height: 1.4;
+  line-height: var(--lh-snug);
 }
 
 .cal-src {
@@ -963,12 +988,32 @@ main {
   color: var(--accent-dark);
 }
 
+/* Хлебные крошки (§6 handoff) — рендерятся в Base.astro из prop breadcrumb */
+.breadcrumbs {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.4rem;
+}
+
+.breadcrumbs a {
+  color: var(--accent-dark);
+  border-bottom: none;
+}
+
+.breadcrumbs .sep {
+  color: var(--border-strong);
+}
+
 /* Article (blog post) */
 .article-header { margin-bottom: 2rem; }
 
 .article-header .post-date {
   color: var(--text-muted);
-  font-size: 0.92rem;
+  font-size: var(--fs-sm);
 }
 
 .prose h2 { font-size: 1.4rem; }
@@ -987,7 +1032,7 @@ main {
   overflow-x: auto;
   border-collapse: collapse;
   margin: 1.2rem 0;
-  font-size: 0.92rem;
+  font-size: var(--fs-sm);
 }
 
 .prose th,
@@ -1001,7 +1046,7 @@ main {
 
 .prose th {
   background: var(--card-bg);
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
 }
 
 /* Просмотр PDF-страниц в посте */
@@ -1012,7 +1057,7 @@ main {
 .pdf-pages summary {
   cursor: pointer;
   color: var(--accent-dark);
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
   user-select: none;
   margin-bottom: 0.8rem;
 }
@@ -1025,12 +1070,33 @@ main {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
 }
 
+/* Цитата — фирменный оранжевый кант + серифный шрифт (§5 handoff) */
 .prose blockquote {
   border-left: 3px solid var(--accent);
-  padding-left: 1.1rem;
-  color: var(--text-muted);
   margin: 1.2rem 0;
-  font-style: italic;
+  padding: 0.3rem 0 0.3rem 1.2rem;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+/* Сноски (§5 handoff) — Astro/GFM рендерит <section class="footnotes"> */
+.prose sup a {
+  color: var(--accent-dark);
+  font-size: 0.7em;
+  border-bottom: none;
+}
+
+.prose .footnotes {
+  margin-top: 1.5rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.prose .footnotes ol {
+  padding-left: 1.4rem;
 }
 
 @media (max-width: 600px) {
