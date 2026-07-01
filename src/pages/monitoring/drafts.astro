@@ -3,11 +3,14 @@ import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
 import Callout from '../../components/Callout.astro';
 
-const draftEntries = (await getCollection('drafts', ({ data }) => !data.hidden))
+const draftEntries = (await getCollection('drafts', ({ data }) => !data.hidden && !data.archived))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const drafts = await Promise.all(
   draftEntries.map(async (d) => ({ id: d.id, data: d.data, Content: (await render(d)).Content })),
 );
+
+// Архив: принятые законы и проекты, утратившие актуальность (отдельная страница).
+const archivedCount = (await getCollection('drafts', ({ data }) => !data.hidden && data.archived)).length;
 
 // Тип акта → короткая метка + ранг юридической силы (меньше = выше сила, идёт первым):
 // закон/законопроект → постановление Правительства → приказ министерства → указание Банка России.
@@ -117,6 +120,13 @@ const formatDate = (d: Date) =>
         </div>
       ))}
     </section>
+  )}
+
+  {archivedCount > 0 && (
+    <div class="drafts-archive">
+      <a class="drafts-archive-link" href="/monitoring/drafts/archive">Архив ({archivedCount})&nbsp;→</a>
+      <span class="drafts-archive-note">Принятые законы и проекты, утратившие актуальность.</span>
+    </div>
   )}
 
   {drafts.length === 0 ? (

@@ -1,0 +1,79 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import Callout from '../../../components/Callout.astro';
+
+const entries = (await getCollection('drafts', ({ data }) => !data.hidden && data.archived))
+  .sort((a, b) => (b.data.lawDate ?? b.data.date).valueOf() - (a.data.lawDate ?? a.data.date).valueOf());
+const items = await Promise.all(
+  entries.map(async (d) => ({ id: d.id, data: d.data, Content: (await render(d)).Content })),
+);
+
+const formatDate = (d: Date) =>
+  d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+
+// «от 26 июня 2026 г. № 195-ФЗ» — реквизиты принятого закона
+function lawRef(data: { lawNumber?: string; lawDate?: Date }): string | null {
+  if (!data.lawNumber && !data.lawDate) return null;
+  const parts: string[] = [];
+  if (data.lawDate) parts.push(`от ${formatDate(data.lawDate)}`);
+  if (data.lawNumber) parts.push(`№ ${data.lawNumber}`);
+  return parts.join(' ');
+}
+---
+
+<Base
+  title="Архив — Проекты НПА — Правовой мониторинг ГЧП"
+  description="Архив отслеживаемых проектов НПА: принятые законы и инициативы, утратившие актуальность."
+>
+  <h1>Архив проектов НПА</h1>
+  <p class="subtitle" style="color: var(--text-muted); margin-top: 0.5rem;">
+    Проекты, работа над которыми завершена: принятые законы (со ссылкой на официальную публикацию)
+    и инициативы, утратившие актуальность. Активные проекты — на странице
+    <a href="/monitoring/drafts/">Проекты НПА</a>.
+  </p>
+
+  {items.length === 0 ? (
+    <Callout><p>Архив пуст.</p></Callout>
+  ) : (
+    <ul class="drafts-list">
+      {items.map((d) => {
+        const ref = lawRef(d.data);
+        return (
+          <li class="draft-item" id={d.id}>
+            <div class="draft-head">
+              <span class="draft-status">{d.data.status}</span>
+              <span class="draft-meta">{d.data.kind}{d.data.number ? ` · № ${d.data.number}` : ''}</span>
+            </div>
+            <h2 class="draft-title">{d.data.title}</h2>
+            {ref && (
+              <p class="draft-lawref">Принят: <strong>Федеральный закон {ref}</strong></p>
+            )}
+            <div class="draft-links">
+              {d.data.pravo && <a class="draft-link" href={d.data.pravo} target="_blank" rel="noopener">Официальная публикация (pravo.gov.ru)&nbsp;↗</a>}
+              {d.data.lawConsultant && <a class="draft-link" href={d.data.lawConsultant} target="_blank" rel="noopener">Текст закона (КонсультантПлюс)&nbsp;↗</a>}
+              {d.data.sozd && <a class="draft-link" href={d.data.sozd} target="_blank" rel="noopener">Паспорт на сайте Госдумы&nbsp;↗</a>}
+              {d.data.passport && <a class="draft-link" href={d.data.passport} target="_blank" rel="noopener">Паспорт (КонсультантПлюс)&nbsp;↗</a>}
+            </div>
+            <details class="release-details draft-desc">
+              <summary>Описание</summary>
+              <div class="draft-body"><d.Content /></div>
+            </details>
+            {d.data.stages && d.data.stages.length > 0 && (
+              <details class="release-details draft-history">
+                <summary>История прохождения ({d.data.stages.length})</summary>
+                <ul class="stage-list">
+                  {d.data.stages.slice().reverse().map((s) => (
+                    <li><span class="stage-date">{formatDate(s.date)}</span> {s.stage}</li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  )}
+
+  <p style="margin-top: 3rem;"><a href="/monitoring/drafts/">← Назад к проектам НПА</a></p>
+</Base>

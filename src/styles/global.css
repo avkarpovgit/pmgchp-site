@@ -750,6 +750,29 @@ main {
   white-space: nowrap;
 }
 
+/* Реквизиты принятого закона в карточке архива */
+.draft-lawref {
+  margin: 0 0 0.6rem;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+/* Блок-ссылка на архив после обзора на странице проектов НПА */
+.drafts-archive {
+  background: var(--card-bg);
+  border: var(--border-hairline);
+  border-radius: var(--radius-xs);
+  padding: 0.8rem 1.2rem;
+  margin: 0 0 2rem;
+}
+.drafts-archive-link { font-weight: var(--fw-bold); }
+.drafts-archive-note {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
 .draft-body {
   margin-top: var(--space-3);
   font-size: 0.93rem;

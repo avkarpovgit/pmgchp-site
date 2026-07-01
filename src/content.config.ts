@@ -54,6 +54,13 @@ const drafts = defineCollection({
     // история прохождения: для законопроектов обновляется скриптом scripts/update_drafts.py по СОЗД
     stages: z.array(z.object({ stage: z.string(), date: z.coerce.date() })).default([]),
     hidden: z.boolean().default(false),        // скрыть из публикации (черновик карточки)
+    // Архив: карточка уходит из активного списка на /monitoring/drafts/archive
+    // (проект принят как закон либо утратил актуальность).
+    archived: z.boolean().default(false),
+    lawNumber: z.string().optional(),          // номер принятого закона, напр. "195-ФЗ"
+    lawDate: z.coerce.date().optional(),       // дата принятого закона (подписания)
+    pravo: z.string().url().optional(),        // официальная публикация на pravo.gov.ru
+    lawConsultant: z.string().url().optional(),// текст принятого закона в КонсультантПлюс (base=LAW)
   }),
 });
 
