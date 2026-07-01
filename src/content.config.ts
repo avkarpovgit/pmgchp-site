@@ -51,7 +51,7 @@ const drafts = defineCollection({
     consultant: z.string().url().optional(),   // текст проекта в КонсультантПлюс
     passport: z.string().url().optional(),     // паспорт проекта в КонсультантПлюс
     source: z.string().url().optional(),       // страница проекта (cbr.ru, regulation.gov.ru и т.п.)
-    // история прохождения: для законопроектов обновляется скриптом scripts/update_drafts.py по СОЗД
+    // история прохождения: заполняется вручную по хронологии СОЗД (см. README → «Статусы законопроектов»)
     stages: z.array(z.object({ stage: z.string(), date: z.coerce.date() })).default([]),
     hidden: z.boolean().default(false),        // скрыть из публикации (черновик карточки)
     // Архив: карточка уходит из активного списка на /monitoring/drafts/archive
