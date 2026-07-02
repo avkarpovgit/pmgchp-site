@@ -44,9 +44,10 @@ for (const a of pending) {
           <div class="cal-monthhead">{r.label}</div>
         ) : (
           <div class="cal-act">
-            <div class="cal-date" aria-hidden="true">
-              <span class="cal-day">{r.day}</span>
-              <span class="cal-mon">{MONTHS_SHORT[r.mon - 1]} {r.year}</span>
+            <div class="cal-date">
+              <span class="visually-hidden">Вступает в силу {r.day} {MONTHS_SHORT[r.mon - 1]} {r.year}</span>
+              <span class="cal-day" aria-hidden="true">{r.day}</span>
+              <span class="cal-mon" aria-hidden="true">{MONTHS_SHORT[r.mon - 1]} {r.year}</span>
             </div>
             <div class="cal-body">
               <a class="cal-title" href={r.url} target="_blank" rel="noopener">{r.title}</a>
