@@ -7,7 +7,7 @@ import WatchTeaser from '../components/WatchTeaser.astro';
 const { years, byYear } = await getMonitoringByYear();
 const recent = years.flatMap((y) => byYear.get(y)!).slice(0, 6);
 
-const draftsCount = (await getCollection('drafts', ({ data }) => !data.hidden)).length;
+const draftsCount = (await getCollection('drafts', ({ data }) => !data.hidden && !data.archived)).length;
 const pendingCount = (await getPendingActs()).length;
 ---
 
