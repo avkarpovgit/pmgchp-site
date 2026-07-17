@@ -28,6 +28,8 @@ const news = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/news' }),
   schema: z.object({
     title: z.string(),
+    // подводка для ленты /news/ (П1, двухчастный заголовок); опциональна и содержательна
+    description: z.string().optional(),
     period: z.string(),
     date: z.coerce.date(),
     // tgId есть у выпусков, опубликованных в Telegram (пост в канале); у черновиков — нет.

@@ -1,12 +1,14 @@
 ---
 // Элемент списка записей (блог, страница тега): дата · заголовок-ссылка · аннотация.
+// minutes — оценка времени чтения для эйброу «Блог · ≈N мин» (П2); без неё эйброу не рендерится.
 interface Props {
   date: Date;
   href: string;
   title: string;
   excerpt?: string;
+  minutes?: number;
 }
-const { date, href, title, excerpt } = Astro.props;
+const { date, href, title, excerpt, minutes } = Astro.props;
 const formatted = date.toLocaleDateString('ru-RU', {
   day: 'numeric',
   month: 'long',
@@ -15,7 +17,15 @@ const formatted = date.toLocaleDateString('ru-RU', {
 ---
 
 <li>
+  {
+    minutes != null && (
+      <p class="feed-eyebrow">
+        <span class="feed-rubric">Блог</span>
+        <span>· ≈{minutes}&nbsp;мин</span>
+      </p>
+    )
+  }
   <span class="post-date">{formatted}</span>
   <h3><a href={href}>{title}</a></h3>
-  {excerpt && <p class="excerpt">{excerpt}</p>}
+  {excerpt && <p class="feed-deck">{excerpt}</p>}
 </li>

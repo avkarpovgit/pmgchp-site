@@ -51,7 +51,7 @@ for (const a of pending) {
             </div>
             <div class="cal-body">
               <a class="cal-title" href={r.url} target="_blank" rel="noopener">{r.title}</a>
-              <span class="cal-src">из выпуска <a href={`/monitoring/${r.slug}/`}>{r.period}</a></span>
+              <span class="cal-src">из выпуска <a href={`/monitoring/${r.slug}/`}>{r.period}</a> <span class="days-left" data-iso={r.iso}></span></span>
             </div>
           </div>
         )
@@ -60,4 +60,28 @@ for (const a of pending) {
   )}
 
   <p style="margin-top: 3rem;"><a href="/monitoring/">← Назад к мониторингу</a></p>
+
+  <script is:inline>
+    // Приписка «· через N дней» к дате вступления в силу (П4): считается на клиенте,
+    // потому что сборка статическая и build-time значение устаревает между деплоями.
+    // Точная дата в пилюле остаётся всегда — приписка только дополняет её (горизонт ≤ 45 дней).
+    (function () {
+      function plural(n, forms) {
+        var n10 = n % 10;
+        var n100 = n % 100;
+        if (n10 === 1 && n100 !== 11) return forms[0];
+        if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return forms[1];
+        return forms[2];
+      }
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);
+      document.querySelectorAll('.days-left[data-iso]').forEach(function (el) {
+        var p = el.getAttribute('data-iso').split('-');
+        var d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+        var days = Math.round((d.getTime() - today.getTime()) / 86400000);
+        if (days <= 0 || days > 45) return;
+        el.textContent = days === 1 ? '· завтра' : '· через ' + days + ' ' + plural(days, ['день', 'дня', 'дней']);
+      });
+    })();
+  </script>
 </Base>

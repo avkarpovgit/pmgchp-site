@@ -2,6 +2,7 @@
 import Base from '../../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
 import Callout from '../../../components/Callout.astro';
+import { actMeta } from '../../../utils/drafts';
 
 const entries = (await getCollection('drafts', ({ data }) => !data.hidden && data.archived))
   .sort((a, b) => (b.data.lawDate ?? b.data.date).valueOf() - (a.data.lawDate ?? a.data.date).valueOf());
@@ -41,10 +42,15 @@ function lawRef(data: { lawNumber?: string; lawDate?: Date }): string | null {
         const ref = lawRef(d.data);
         return (
           <li class="draft-item" id={d.id}>
-            <div class="draft-head">
-              <span class="draft-status">{d.data.status}</span>
-              <span class="draft-meta">{d.data.kind}{d.data.number ? ` · № ${d.data.number}` : ''}</span>
-            </div>
+            <p class="feed-eyebrow">
+              <span class="feed-rubric">{actMeta(d.data.kind).short}</span>
+              {d.data.number && (
+                <span>
+                  · №&nbsp;{d.data.number}
+                </span>
+              )}
+              <span class="feed-status">· {d.data.status}</span>
+            </p>
             <h2 class="draft-title">{d.data.title}</h2>
             {ref && (
               <p class="draft-lawref">Принят: <strong>Федеральный закон {ref}</strong></p>

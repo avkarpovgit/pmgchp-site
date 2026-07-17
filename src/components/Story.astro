@@ -1,0 +1,34 @@
+---
+// Сюжет — редакторская подборка материалов одной темы (П3, PATTERNS-DS).
+// Данные собираются вручную в src/data/stories.json; на странице — не больше одного-двух.
+interface StoryItem {
+  rubric: string;
+  meta?: string;
+  text: string;
+  href: string;
+}
+interface Props {
+  title: string;
+  items: StoryItem[];
+  moreHref?: string;
+  moreLabel?: string;
+}
+const { title, items, moreHref, moreLabel } = Astro.props;
+---
+
+<section class="story">
+  <p class="feed-eyebrow"><span class="feed-rubric">Сюжет</span></p>
+  <h2 class="story-title">{title}</h2>
+  {items.map((it) => (
+    <div class="story-item">
+      <p class="feed-eyebrow">
+        <span class="feed-rubric">{it.rubric}</span>
+        {it.meta && <span>· {it.meta}</span>}
+      </p>
+      <p><a href={it.href}>{it.text}</a></p>
+    </div>
+  ))}
+  {moreHref && (
+    <p class="story-more"><a href={moreHref}>{moreLabel ?? 'Все материалы сюжета →'}</a></p>
+  )}
+</section>

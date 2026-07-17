@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
 import Callout from '../../components/Callout.astro';
+import { actMeta } from '../../utils/drafts';
 
 const draftEntries = (await getCollection('drafts', ({ data }) => !data.hidden && !data.archived))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -11,24 +12,6 @@ const drafts = await Promise.all(
 
 // Архив: принятые законы и проекты, утратившие актуальность (отдельная страница).
 const archivedCount = (await getCollection('drafts', ({ data }) => !data.hidden && data.archived)).length;
-
-// Тип акта → короткая метка + ранг юридической силы (меньше = выше сила, идёт первым):
-// закон/законопроект → постановление Правительства → приказ министерства → указание Банка России.
-function actMeta(kind: string): { rank: number; short: string } {
-  const k = kind.toLowerCase();
-  if (k.includes('закон')) return { rank: 1, short: 'Законопроект' };
-  if (k.includes('постановлени')) return { rank: 2, short: 'ПП РФ' };
-  if (k.includes('приказ')) {
-    let short = 'Приказ';
-    if (k.includes('минэконом')) short = 'Приказ МЭР';
-    else if (k.includes('минфин')) short = 'Приказ Минфина';
-    else if (k.includes('минстро')) short = 'Приказ Минстроя';
-    else if (k.includes('минтранс')) short = 'Приказ Минтранса';
-    return { rank: 3, short };
-  }
-  if (k.includes('указани')) return { rank: 4, short: 'Указание ЦБ' };
-  return { rank: 5, short: kind };
-}
 
 // Номер проекта подзаконного акта на regulation.gov.ru (из ссылки source) — по аналогии с номером законопроекта
 function regNum(source?: string): string | null {
@@ -108,11 +91,16 @@ const formatDate = (d: Date) =>
               const text = (d.data.summary ?? d.data.title).replace(/\.+$/, '');
               return (
                 <li>
-                  <span class="summary-no">{numById.get(d.id)}.</span>{' '}
-                  <span class="summary-kind">{actMeta(d.data.kind).short}</span>
-                  {' — '}
+                  <p class="feed-eyebrow">
+                    <span>{numById.get(d.id)} ·</span>
+                    <span class="feed-rubric">{actMeta(d.data.kind).short}</span>
+                    {ref && (
+                      <span>
+                        · {ref.mark}&nbsp;{ref.value}
+                      </span>
+                    )}
+                  </p>
                   <a href={`#${d.id}`}>{text}</a>
-                  {ref && <span class="summary-num"> · {ref.mark} {ref.value}</span>}
                 </li>
               );
             })}
@@ -141,11 +129,16 @@ const formatDate = (d: Date) =>
               const ref = refNum(d.data);
               return (
         <li class="draft-item" id={d.id}>
-          <div class="draft-head">
-            <span class="draft-no">{numById.get(d.id)}</span>
-            <span class="draft-status">{d.data.status}</span>
-            <span class="draft-meta">{d.data.kind}{ref ? ` · ${ref.mark} ${ref.value}` : ''}</span>
-          </div>
+          <p class="feed-eyebrow">
+            <span>{numById.get(d.id)} ·</span>
+            <span class="feed-rubric">{actMeta(d.data.kind).short}</span>
+            {ref && (
+              <span>
+                · {ref.mark}&nbsp;{ref.value}
+              </span>
+            )}
+            <span class="feed-status">· {d.data.status}</span>
+          </p>
           <h3 class="draft-title">{d.data.title}</h3>
           <div class="draft-links">
             {d.data.sozd && <a class="draft-link" href={d.data.sozd} target="_blank" rel="noopener">Паспорт на сайте Госдумы&nbsp;↗</a>}

@@ -3,6 +3,10 @@ import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { cleanPeriod, getPendingActs, plural, getMonitoringByYear } from '../utils/monitoring';
 import WatchTeaser from '../components/WatchTeaser.astro';
+import Story from '../components/Story.astro';
+import stories from '../data/stories.json';
+
+const story = stories[0]; // на странице — один сюжет; пустой stories.json → блока нет
 
 const { years, byYear } = await getMonitoringByYear();
 const recent = years.flatMap((y) => byYear.get(y)!).slice(0, 6);
@@ -30,10 +34,16 @@ const pendingCount = (await getPendingActs()).length;
     </WatchTeaser>
   </div>
 
+  {story && <Story title={story.title} items={story.items} moreHref={story.moreHref} moreLabel={story.moreLabel} />}
+
   <h2>Последние выпуски</h2>
   <ul class="monitoring-list">
     {recent.map((r) => (
       <li>
+        <p class="feed-eyebrow">
+          <span class="feed-rubric">Мониторинг</span>
+          {r.items.length > 0 && <span>· {r.items.length}&nbsp;{plural(r.items.length, ['позиция', 'позиции', 'позиций'])}</span>}
+        </p>
         {r.slug ? (
           <a href={`/monitoring/${r.slug}/`}>{cleanPeriod(r.period)}</a>
         ) : (
@@ -44,7 +54,7 @@ const pendingCount = (await getPendingActs()).length;
         )}
         {r.items.length > 0 && (
           <details class="release-details">
-            <summary>Содержание ({r.items.length})</summary>
+            <summary>Содержание</summary>
             <ul class="release-items">
               {r.items.map((item) => <li>{item}</li>)}
             </ul>

@@ -30,6 +30,10 @@ const { year, entries } = Astro.props;
   <ul class="monitoring-list">
     {entries.map((r) => (
       <li>
+        <p class="feed-eyebrow">
+          <span class="feed-rubric">Мониторинг</span>
+          {r.items.length > 0 && <span>· {r.items.length}&nbsp;{plural(r.items.length, ['позиция', 'позиции', 'позиций'])}</span>}
+        </p>
         {r.slug ? (
           <a href={`/monitoring/${r.slug}/`}>{cleanPeriod(r.period)}</a>
         ) : (
@@ -40,7 +44,7 @@ const { year, entries } = Astro.props;
         )}
         {r.items.length > 0 && (
           <details class="release-details">
-            <summary>Содержание ({r.items.length})</summary>
+            <summary>Содержание</summary>
             <ul class="release-items">
               {r.items.map((item) => <li>{item}</li>)}
             </ul>

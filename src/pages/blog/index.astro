@@ -9,6 +9,10 @@ import Tag from '../../components/Tag.astro';
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
+// оценка времени чтения для эйброу (П2): ~1500 знаков в минуту, минимум 1 мин
+const readMinutes = (p: (typeof posts)[number]) =>
+  Math.max(1, Math.round(((p as { body?: string }).body ?? '').length / 1500));
+
 const tagCounts = new Map<string, number>();
 posts.forEach((p) => p.data.tags.forEach((t: string) => tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1)));
 const allTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
@@ -37,7 +41,7 @@ const allTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
   ) : (
     <ul class="post-list">
       {posts.map((post) => (
-        <PostListItem date={post.data.date} href={`/blog/${post.id}/`} title={post.data.title} excerpt={post.data.description} />
+        <PostListItem date={post.data.date} href={`/blog/${post.id}/`} title={post.data.title} excerpt={post.data.description} minutes={readMinutes(post)} />
       ))}
     </ul>
   )}

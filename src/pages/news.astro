@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 import { cleanPeriod, plural } from '../utils/monitoring';
 import Callout from '../components/Callout.astro';
 
-type Entry = { date: string; period: string; title: string; slug: string; tgId?: number };
+type Entry = { date: string; period: string; title: string; slug: string; tgId?: number; events: number; description?: string };
 
 const pages = await getCollection('news');
 const entries: Entry[] = pages.map((p) => ({
@@ -13,6 +13,9 @@ const entries: Entry[] = pages.map((p) => ({
   title: p.data.title,
   slug: p.id,
   tgId: p.data.tgId ?? undefined,
+  // объём выпуска для эйброу — число событий (строк «- ») в теле дайджеста
+  events: ((p as { body?: string }).body ?? '').match(/^- /gm)?.length ?? 0,
+  description: p.data.description,
 }));
 
 const byYear = new Map<string, Entry[]>();
@@ -56,10 +59,15 @@ const currentYear = years[0];
             <ul class="monitoring-list">
               {list.map((r) => (
                 <li>
+                  <p class="feed-eyebrow">
+                    <span class="feed-rubric">Новости</span>
+                    {r.events > 0 && <span>· {r.events}&nbsp;{plural(r.events, ['событие', 'события', 'событий'])}</span>}
+                  </p>
                   <a href={`/news/${r.slug}/`}>{cleanPeriod(r.period)}</a>
                   {r.tgId != null && (
                     <a class="release-tg" href={`https://t.me/pmgchp/${r.tgId}`} target="_blank" rel="noopener" title="Выпуск в Telegram">TG ↗</a>
                   )}
+                  {r.description && <p class="feed-deck">{r.description}</p>}
                 </li>
               ))}
             </ul>

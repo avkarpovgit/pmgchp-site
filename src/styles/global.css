@@ -706,6 +706,72 @@ main {
   margin-bottom: 0.25rem;
 }
 
+/* Эйброу-метаданные ленты (handoff «приёмы ленты», 07-2026, П2) */
+.feed-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.45rem;
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-eyebrow);
+  color: var(--text-muted);
+  margin-bottom: 0.15rem;
+}
+.feed-rubric {
+  color: var(--accent-dark);
+  font-weight: var(--fw-semibold);
+}
+/* Статус в эйброу (карточки проектов НПА) — акцент начертанием, не цветом (П2) */
+.feed-status {
+  color: var(--text);
+  font-weight: var(--fw-semibold);
+}
+
+/* Подводка двухчастного заголовка (П1) */
+.feed-deck {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  margin: 0.2rem 0 0;
+  text-wrap: pretty;
+}
+
+/* Лид-абзац статьи (news/monitoring) — типографика подводки; поля абзаца
+   остаются от prose-потока, поэтому селектор отдельный от .feed-deck (П1) */
+.feed-lead > p:first-child {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/* Сюжет — редакторская подборка по теме (П3) */
+.story {
+  background: var(--card-bg);
+  border: var(--border-hairline);
+  border-left: var(--accent-rule) solid var(--accent);
+  border-radius: var(--radius-xs);
+  padding: 1.1rem 1.3rem;
+  margin: var(--space-7) 0;
+}
+.story-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: var(--fw-semibold);
+  margin: 0.1rem 0 0.9rem;
+}
+.story-item {
+  border-top: 1px solid var(--border);
+  padding: 0.75rem 0 0;
+  margin-top: 0.75rem;
+}
+.story-item p { margin: 0; line-height: var(--lh-snug); }
+.story-more { font-size: var(--fs-sm); margin-top: 0.9rem; }
+.story-more a { border-bottom: none; }
+
+/* Приписка-дедлайн «через N дней» (П4) — заполняется скриптом */
+.days-left { color: var(--accent-dark); white-space: nowrap; }
+
 /* Monitoring: подразделы (проекты НПА, ожидающие вступления в силу) */
 .mon-block {
   margin: 1.2rem 0 2.6rem;
@@ -731,30 +797,6 @@ main {
   border-radius: var(--radius-xs);
   padding: 1rem 1.2rem;
   margin-bottom: var(--space-4);
-}
-
-.draft-head {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  margin-bottom: var(--space-2);
-}
-
-.draft-status {
-  display: inline-block;
-  padding: 0.13rem 0.6rem;
-  border-radius: var(--radius-pill);
-  background: var(--accent-fill);
-  color: var(--accent-contrast);
-  font-size: 0.76rem;
-  font-weight: var(--fw-semibold);
-  letter-spacing: var(--ls-tight);
-}
-
-.draft-meta {
-  color: var(--text-muted);
-  font-size: 0.84rem;
 }
 
 .draft-title {
@@ -834,24 +876,15 @@ main {
   color: var(--text-muted);
 }
 .summary-group ul { margin: 0; padding-left: 0; list-style: none; }
-.summary-group li { margin: var(--space-1) 0; font-size: var(--fs-sm); line-height: 1.45; }
-.summary-no { color: var(--text); font-weight: var(--fw-bold); margin-right: 0.1rem; }
-.draft-no {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  flex: 0 0 auto;
-  border-radius: var(--radius-round);
-  border: 1.5px solid var(--accent);
-  color: var(--accent-dark);
-  font-size: 0.82rem;
-  font-weight: var(--fw-bold);
+/* Пункт обзора — эйброу «N · вид · реквизит» + ссылка-описание (стиль ленты, 07-2026) */
+.summary-group li { margin: 0.6rem 0 0.75rem; font-size: var(--fs-sm); line-height: 1.45; }
+/* Ссылка-описание — тёмный заголовок элемента (П1): единственный цветной фрагмент
+   пункта — рубрика в эйброу; hover возвращает акцент */
+.summary-group li a {
+  color: var(--text);
+  border-bottom: none;
 }
-.summary-kind { font-weight: var(--fw-semibold); color: var(--text); white-space: nowrap; }
-.summary-num { color: var(--text-muted); font-size: 0.84rem; white-space: nowrap; }
-
+.summary-group li a:hover { color: var(--accent-dark); }
 /* Тематические заголовки основного списка карточек (как группы в обзоре) */
 .drafts-topic {
   margin: 2.2rem 0 1rem;
