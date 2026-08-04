@@ -226,9 +226,10 @@
           }
         }, { passive: false });
       })();
-    </script> <!-- Cookie-согласие + Яндекс.Метрика: счётчик грузится ТОЛЬКО после явного согласия --> <script type="text/javascript">
+    </script> <!-- Cookie-согласие + аналитика (Яндекс.Метрика, Google Analytics): счётчики грузятся ТОЛЬКО после явного согласия --> <script type="text/javascript">
       (function () {
         var KEY = 'analyticsConsent'; // 'granted' | 'denied'
+        var GA_ID = 'G-HCJT3ZZDR8';
 
         // Ссылка «Настройки cookie» в футере — сбросить согласие и показать баннер снова
         var resetLink = document.getElementById('cookie-reset');
@@ -251,15 +252,34 @@
           ym(109802057, "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: false });
         }
 
+        function loadGoogleAnalytics() {
+          if (window.__gaLoaded) return;
+          window.__gaLoaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+          document.head.appendChild(s);
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){ dataLayer.push(arguments); }
+          window.gtag = window.gtag || gtag;
+          gtag('js', new Date());
+          gtag('config', GA_ID);
+        }
+
+        function loadAnalytics() {
+          loadMetrika();
+          loadGoogleAnalytics();
+        }
+
         var consent = null;
         try { consent = localStorage.getItem(KEY); } catch (e) {}
-        if (consent === 'granted') { loadMetrika(); return; }
+        if (consent === 'granted') { loadAnalytics(); return; }
         if (consent === 'denied') { return; }
 
         function showBanner() {
           var bar = document.createElement('div');
           bar.className = 'cookie-notice';
-          bar.innerHTML = 'Мы используем <a href="/terms/">Яндекс.Метрику</a> (cookie) для статистики посещаемости. ' +
+          bar.innerHTML = 'Мы используем <a href="/terms/">Яндекс.Метрику и Google Analytics</a> (cookie) для статистики посещаемости. ' +
             'Аналитика подключается только с вашего согласия. ' +
             '<button type="button" data-act="accept">Принять</button>' +
             '<button type="button" data-act="decline">Отклонить</button>';
@@ -268,7 +288,7 @@
             var act = t && t.getAttribute ? t.getAttribute('data-act') : null;
             if (!act) return;
             try { localStorage.setItem(KEY, act === 'accept' ? 'granted' : 'denied'); } catch (e) {}
-            if (act === 'accept') loadMetrika();
+            if (act === 'accept') loadAnalytics();
             bar.remove();
           });
           document.body.appendChild(bar);

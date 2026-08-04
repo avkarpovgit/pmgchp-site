@@ -40,14 +40,15 @@
 4.1. Сайт является статическим и не содержит форм обратной связи; Администратор не собирает
     персональные данные посетителей, позволяющие установить личность.
 </p> <p>
-4.2. Для сбора обезличенной статистики посещаемости на Сайте используется счётчик
-    «Яндекс.Метрика» (оператор — ООО «Яндекс»), который <strong>подключается только после
-    выраженного согласия посетителя в cookie-баннере; до получения согласия счётчик
-    не загружается</strong>. Счётчик использует файлы cookie и обрабатывает
-    технические данные о посещении (адреса просмотренных страниц, источник перехода, тип
-    устройства и браузера, обезличенный идентификатор посетителя). Запись действий посетителей
-    (вебвизор) отключена. Подробнее — в
-<a href="https://yandex.ru/legal/confidential/" target="_blank" rel="noopener">политике конфиденциальности Яндекса</a>.
+4.2. Для сбора обезличенной статистики посещаемости на Сайте используются счётчики
+    «Яндекс.Метрика» (оператор — ООО «Яндекс») и Google Analytics (оператор — Google Ireland
+    Limited), которые <strong>подключаются только после выраженного согласия посетителя
+    в cookie-баннере; до получения согласия счётчики не загружаются</strong>. Счётчики
+    используют файлы cookie и обрабатывают технические данные о посещении (адреса просмотренных
+    страниц, источник перехода, тип устройства и браузера, обезличенный идентификатор
+    посетителя). Запись действий посетителей (вебвизор) отключена. Подробнее — в
+<a href="https://yandex.ru/legal/confidential/" target="_blank" rel="noopener">политике конфиденциальности Яндекса</a>
+и <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">политике конфиденциальности Google</a>.
 </p> <p>
 4.3. Аналитика подключается только после нажатия «Принять» в cookie-баннере. Вы вправе
     отказаться (кнопка «Отклонить») — отказ не ограничивает доступ к материалам Сайта. Изменить
@@ -177,9 +178,10 @@
           }
         }, { passive: false });
       })();
-    </script> <!-- Cookie-согласие + Яндекс.Метрика: счётчик грузится ТОЛЬКО после явного согласия --> <script type="text/javascript">
+    </script> <!-- Cookie-согласие + аналитика (Яндекс.Метрика, Google Analytics): счётчики грузятся ТОЛЬКО после явного согласия --> <script type="text/javascript">
       (function () {
         var KEY = 'analyticsConsent'; // 'granted' | 'denied'
+        var GA_ID = 'G-HCJT3ZZDR8';
 
         // Ссылка «Настройки cookie» в футере — сбросить согласие и показать баннер снова
         var resetLink = document.getElementById('cookie-reset');
@@ -202,15 +204,34 @@
           ym(109802057, "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: false });
         }
 
+        function loadGoogleAnalytics() {
+          if (window.__gaLoaded) return;
+          window.__gaLoaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+          document.head.appendChild(s);
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){ dataLayer.push(arguments); }
+          window.gtag = window.gtag || gtag;
+          gtag('js', new Date());
+          gtag('config', GA_ID);
+        }
+
+        function loadAnalytics() {
+          loadMetrika();
+          loadGoogleAnalytics();
+        }
+
         var consent = null;
         try { consent = localStorage.getItem(KEY); } catch (e) {}
-        if (consent === 'granted') { loadMetrika(); return; }
+        if (consent === 'granted') { loadAnalytics(); return; }
         if (consent === 'denied') { return; }
 
         function showBanner() {
           var bar = document.createElement('div');
           bar.className = 'cookie-notice';
-          bar.innerHTML = 'Мы используем <a href="/terms/">Яндекс.Метрику</a> (cookie) для статистики посещаемости. ' +
+          bar.innerHTML = 'Мы используем <a href="/terms/">Яндекс.Метрику и Google Analytics</a> (cookie) для статистики посещаемости. ' +
             'Аналитика подключается только с вашего согласия. ' +
             '<button type="button" data-act="accept">Принять</button>' +
             '<button type="button" data-act="decline">Отклонить</button>';
@@ -219,7 +240,7 @@
             var act = t && t.getAttribute ? t.getAttribute('data-act') : null;
             if (!act) return;
             try { localStorage.setItem(KEY, act === 'accept' ? 'granted' : 'denied'); } catch (e) {}
-            if (act === 'accept') loadMetrika();
+            if (act === 'accept') loadAnalytics();
             bar.remove();
           });
           document.body.appendChild(bar);
