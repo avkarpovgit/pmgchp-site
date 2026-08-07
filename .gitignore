@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # состояние watcher-а новых проектов на regulation.gov.ru (локальное, меняется каждый прогон)
 scripts/reg_watch_state.json
+
+# python bytecode
+__pycache__/
