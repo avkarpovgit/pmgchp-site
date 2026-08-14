@@ -483,17 +483,13 @@ main {
   }
 }
 
-/* Карточка «Мониторинг» с под-ссылками трекеров (проекты НПА, акты в силе) */
-.section-card h3 a {
-  color: inherit;
-  text-decoration: none;
-}
-.section-card h3 a:hover {
-  text-decoration: underline;
-}
+/* Карточка «Мониторинг» с под-ссылками трекеров (проекты НПА, акты в силе).
+   align-items: flex-start — чтобы ссылка сжималась по тексту и подчёркивание
+   заканчивалось вместе со словом, а не тянулось до края карточки. */
 .card-watch {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-1);
   margin-top: var(--space-2);
 }

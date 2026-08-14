@@ -1,7 +1,7 @@
 ---
 // Карточка раздела на главной. Две формы:
 //  - href задан → вся карточка <a> (заголовок без ссылки);
-//  - titleHref задан → <div>, ссылка только на заголовке (+ под-ссылки watch).
+//  - href не задан → <div>, ссылки только в meta и под-ссылках watch (заголовок без ссылки).
 interface WatchLink {
   label: string;
   href: string;
@@ -9,7 +9,6 @@ interface WatchLink {
 interface Props {
   title: string;
   href?: string;
-  titleHref?: string;
   meta?: string;
   metaHref?: string;
   watch?: WatchLink[];
@@ -17,12 +16,12 @@ interface Props {
   target?: string;
   rel?: string;
 }
-const { title, href, titleHref, meta, metaHref, watch, class: cls, target, rel } = Astro.props;
+const { title, href, meta, metaHref, watch, class: cls, target, rel } = Astro.props;
 const Wrapper = href ? 'a' : 'div';
 ---
 
 <Wrapper class:list={['section-card', cls]} href={href} target={target} rel={rel}>
-  <h3>{titleHref ? <a href={titleHref}>{title}</a> : title}</h3>
+  <h3>{title}</h3>
   <p><slot /></p>
   {meta && <span class="card-meta">{metaHref ? <a href={metaHref}>{meta}</a> : meta}</span>}
   {
