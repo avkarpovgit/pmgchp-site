@@ -67,11 +67,31 @@ CORE = [
 # концессионных соглашениях, и закон о противодействии отмыванию доходов —
 # на этом фильтр ловил проекты ЦБ по ПОД/ФТ (проверено 07.08.2026 на 169982).
 # Поэтому номер засчитывается только при отсутствии чужого контекста.
+# С 23.09.2026 номер проверяется и по названию закона, идущему сразу за ним:
+# чужое название → мимо (ложная находка 171108 — 115-ФЗ «О правовом положении
+# иностранных граждан»), своё → сильное, номер без названия → слабое (вручную).
 NUMERIC = [
     r"115-ФЗ",
     r"224-ФЗ",
     r"\b69-ФЗ\b",
 ]
+
+# Своё название для каждого номера (ищется в названии за номером).
+NUMERIC_TITLES = {
+    "115-фз": r"концессион",
+    "224-фз": r"частн\w* партн",
+    "69-фз": r"капиталовложени",
+}
+
+# Название акта сразу за номером: «…» или "…".
+TITLE_AFTER_RE = re.compile(r'^\s*[«"“„]([^»"”]{3,200})')
+
+# Название-«сборник» («О внесении изменений в отдельные законодательные акты…»)
+# предмет не раскрывает — такой номер идёт в ручную проверку, а не в отсев.
+OMNIBUS_TITLE_RE = re.compile(
+    r"О внесении изменени|законодательные акты|нормативные правовые акты",
+    re.IGNORECASE,
+)
 
 # Чужой контекст для номеров законов.
 EXCLUDE = [
@@ -165,11 +185,26 @@ def classify(project):
     blob = " ".join(parts)
     if CORE_RE.search(blob):
         return "strong"
-    if NUMERIC_RE.search(blob) and not EXCLUDE_RE.search(blob):
+    numeric = None if EXCLUDE_RE.search(blob) else numeric_signal(blob)
+    if numeric == "strong":
         return "strong"
-    if WEAK_RE.search(blob):
+    if numeric == "weak" or WEAK_RE.search(blob):
         return "weak"
     return None
+
+
+def numeric_signal(blob):
+    """Номер закона: своё название за ним → strong; без названия или с
+    названием-«сборником» → weak; только чужие названия → None."""
+    best = None
+    for m in NUMERIC_RE.finditer(blob):
+        own = NUMERIC_TITLES[m.group(0).lower()]
+        title = TITLE_AFTER_RE.match(blob[m.end():])
+        if title is None or OMNIBUS_TITLE_RE.search(title.group(1)):
+            best = best or "weak"
+        elif re.search(own, title.group(1), re.IGNORECASE):
+            return "strong"
+    return best
 
 
 def describe(p):
