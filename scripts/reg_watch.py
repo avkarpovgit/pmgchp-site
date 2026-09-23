@@ -86,6 +86,13 @@ NUMERIC_TITLES = {
 # Название акта сразу за номером: «…» или "…".
 TITLE_AFTER_RE = re.compile(r'^\s*[«"“„]([^»"”]{3,200})')
 
+# Название-«сборник» («О внесении изменений в отдельные законодательные акты…»)
+# предмет не раскрывает — такой номер идёт в ручную проверку, а не в отсев.
+OMNIBUS_TITLE_RE = re.compile(
+    r"О внесении изменени|законодательные акты|нормативные правовые акты",
+    re.IGNORECASE,
+)
+
 # Чужой контекст для номеров законов.
 EXCLUDE = [
     r"легализаци",
@@ -187,13 +194,13 @@ def classify(project):
 
 
 def numeric_signal(blob):
-    """Номер закона: своё название за ним → strong, без названия → weak,
-    только чужие названия → None."""
+    """Номер закона: своё название за ним → strong; без названия или с
+    названием-«сборником» → weak; только чужие названия → None."""
     best = None
     for m in NUMERIC_RE.finditer(blob):
         own = NUMERIC_TITLES[m.group(0).lower()]
         title = TITLE_AFTER_RE.match(blob[m.end():])
-        if title is None:
+        if title is None or OMNIBUS_TITLE_RE.search(title.group(1)):
             best = best or "weak"
         elif re.search(own, title.group(1), re.IGNORECASE):
             return "strong"
