@@ -1158,6 +1158,25 @@ main {
 
 .prose h2 { font-size: 1.4rem; }
 
+.prose .editorial-note {
+  margin: var(--space-4) 0;
+  padding: var(--space-4) var(--space-5);
+  border-left: var(--accent-rule) solid var(--accent);
+  border-radius: var(--radius-xs);
+  background: var(--warning-bg);
+  color: var(--text);
+  font-style: normal;
+}
+
+.prose .editorial-note p {
+  margin: 0;
+}
+
+.prose .editorial-note .editorial-note-title {
+  margin-bottom: var(--space-2);
+  font-weight: var(--fw-bold);
+}
+
 .prose img {
   max-width: 100%;
   height: auto;
