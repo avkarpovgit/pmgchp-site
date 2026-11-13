@@ -26,6 +26,6 @@ const formatted = date.toLocaleDateString('ru-RU', {
     )
   }
   <span class="post-date">{formatted}</span>
-  <h3><a href={href}>{title}</a></h3>
+  <h2><a href={href}>{title}</a></h2>
   {excerpt && <p class="feed-deck">{excerpt}</p>}
 </li>

@@ -119,7 +119,8 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
     <title>{title}</title>
   </head>
   <body>
-    <header class="site-header">
+    <a class="skip-link" href="#content" data-pagefind-ignore>Перейти к содержанию</a>
+    <header class="site-header" data-pagefind-ignore="all">
       <div class="container">
         <div class="site-brand">
           <a href="/" class="site-title">
@@ -136,7 +137,7 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
         </nav>
       </div>
     </header>
-    <main>
+    <main id="content" tabindex="-1">
       <div class="container">
         {crumbs.length > 0 && (
           <nav class="breadcrumbs" aria-label="Хлебные крошки">
@@ -151,7 +152,7 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
         <slot />
       </div>
     </main>
-    <footer class="site-footer">
+    <footer class="site-footer" data-pagefind-ignore="all">
       <div class="container">
         <span>© {new Date().getFullYear()} Александр Карпов</span>
         <span>
@@ -165,7 +166,7 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
           Материалы сайта — <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> ·
           <a href="/terms/">Пользовательское соглашение</a> ·
           <a href="/rss.xml">RSS</a> ·
-          <a href="#" id="cookie-reset">Настройки cookie</a>
+          <button type="button" id="cookie-reset" class="link-button">Настройки cookie</button>
         </span>
       </div>
     </footer>
@@ -200,6 +201,17 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
           refresh();
         });
         refresh();
+      })();
+
+      // Ссылки, открывающиеся в новой вкладке, предупреждают об этом экранный диктор
+      (function () {
+        var links = document.querySelectorAll('a[target="_blank"]');
+        for (var i = 0; i < links.length; i++) {
+          var s = document.createElement('span');
+          s.className = 'visually-hidden';
+          s.textContent = ' (откроется в новой вкладке)';
+          links[i].appendChild(s);
+        }
       })();
 
       // Cookie-согласие и Яндекс.Метрика — в отдельном блоке ниже:
@@ -269,7 +281,7 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
         var KEY = 'analyticsConsent'; // 'granted' | 'denied'
         var GA_ID = 'G-HCJT3ZZDR8';
 
-        // Ссылка «Настройки cookie» в футере — сбросить согласие и показать баннер снова
+        // Кнопка «Настройки cookie» в футере — сбросить согласие и показать баннер снова
         var resetLink = document.getElementById('cookie-reset');
         if (resetLink) {
           resetLink.addEventListener('click', function (ev) {
@@ -333,9 +345,10 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
             root.classList.remove('has-cookie-notice');
             if (ro) ro.disconnect();
           });
-          // Баннер — первым в DOM: с клавиатуры до «Принять» не нужно проходить всю страницу.
-          // Визуально он по-прежнему внизу (position: fixed).
-          document.body.prepend(bar);
+          // Баннер — в начале DOM, сразу после «Перейти к содержанию»: с клавиатуры до «Принять»
+          // не нужно проходить всю страницу. Визуально он по-прежнему внизу (position: fixed).
+          var skip = document.querySelector('.skip-link');
+          if (skip) skip.after(bar); else document.body.prepend(bar);
           // Под баннер резервируется место, чтобы он не закрывал фокус и конец страницы (WCAG 2.4.11).
           var root = document.documentElement;
           function syncHeight() { root.style.setProperty('--cookie-h', bar.offsetHeight + 'px'); }

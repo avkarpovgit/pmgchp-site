@@ -248,6 +248,46 @@ html {
   border: 0;
 }
 
+/* «Перейти к содержанию»: скрыта, пока не получит фокус с клавиатуры (WCAG 2.4.1) */
+.skip-link {
+  position: absolute;
+  left: var(--space-3);
+  top: -100px;
+  z-index: 200;
+  padding: var(--space-2) var(--space-4);
+  background: var(--card-bg);
+  color: var(--accent-dark);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-pill);
+}
+
+.skip-link:focus {
+  top: var(--space-3);
+}
+
+/* Цель перехода по «Перейти к содержанию»: фокус программный, кольцо вокруг всей страницы не нужно */
+main[tabindex="-1"]:focus,
+main[tabindex="-1"]:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Кнопка, оформленная как ссылка (действие без перехода, например «Настройки cookie») */
+.link-button {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--link-underline);
+  border-radius: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--accent-dark);
+  cursor: pointer;
+}
+
+.link-button:hover {
+  border-bottom-color: currentColor;
+}
+
 body {
   background: var(--bg);
   color: var(--text);
@@ -632,17 +672,19 @@ main {
   font-size: 0.88rem;
 }
 
-.post-list h3 {
+/* Заголовки записей в списке — h2 (после h1 страницы, без пропуска уровня), размер прежний, как у h3 */
+.post-list h2 {
+  font-size: var(--fs-h3);
   margin-top: 0.2rem;
   margin-bottom: 0.3rem;
 }
 
-.post-list h3 a {
+.post-list h2 a {
   color: var(--text);
   border-bottom: none;
 }
 
-.post-list h3 a:hover { color: var(--accent-dark); }
+.post-list h2 a:hover { color: var(--accent-dark); }
 
 .post-list .excerpt {
   color: var(--text-muted);
