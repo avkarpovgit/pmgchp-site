@@ -17,6 +17,8 @@ import Base from '../layouts/Base.astro';
     </p>
   </noscript>
   <div id="search" class="search-box">Поиск загружается…</div>
+  <!-- Объявление числа результатов для экранных дикторов: Pagefind Default UI сам его не озвучивает (WCAG 4.1.3) -->
+  <div id="search-status" class="visually-hidden" role="status" aria-live="polite"></div>
 
   <script is:inline src="/pagefind/pagefind-ui.js"></script>
   <script is:inline>
@@ -41,6 +43,19 @@ import Base from '../layouts/Base.astro';
           searching: 'Ищем «[SEARCH_TERM]»…',
         },
       });
+      // Копируем итоговое сообщение Pagefind в живую область с задержкой,
+      // чтобы при наборе не объявлять каждое промежуточное «Ищем…».
+      var status = document.getElementById('search-status');
+      var announceTimer = null;
+      new MutationObserver(function () {
+        clearTimeout(announceTimer);
+        announceTimer = setTimeout(function () {
+          var m = document.querySelector('#search .pagefind-ui__message');
+          var text = m ? m.textContent.trim() : '';
+          if (status.textContent !== text) status.textContent = text;
+        }, 700);
+      }).observe(document.getElementById('search'), { childList: true, subtree: true, characterData: true });
+
       var input = document.querySelector('#search input');
       var q = new URLSearchParams(location.search).get('q');
       if (input && q) {
