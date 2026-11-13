@@ -194,6 +194,9 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
           }
           meta.content = effective() === 'dark' ? '#221426' : '#fdfcfa';
         }
+        // смена системной темы при автоматическом режиме — обновить значок и имя кнопки
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.addEventListener) mq.addEventListener('change', refresh);
         btn.addEventListener('click', function () {
           var next = effective() === 'dark' ? 'light' : 'dark';
           document.documentElement.setAttribute('data-theme', next);

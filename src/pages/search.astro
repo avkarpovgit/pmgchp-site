@@ -19,6 +19,10 @@ import Base from '../layouts/Base.astro';
   <div id="search" class="search-box">Поиск загружается…</div>
   <!-- Объявление числа результатов для экранных дикторов: Pagefind Default UI сам его не озвучивает (WCAG 4.1.3) -->
   <div id="search-status" class="visually-hidden" role="status" aria-live="polite"></div>
+  <p id="search-slow" class="search-slow" hidden>
+    Поиск отвечает дольше обычного. Если результатов так и нет, обновите страницу или откройте разделы
+    <a href="/news/">«Новости»</a>, <a href="/blog/">«Блог»</a> и <a href="/monitoring/">«Мониторинг»</a>.
+  </p>
 
   <script is:inline src="/pagefind/pagefind-ui.js"></script>
   <script is:inline>
@@ -43,16 +47,44 @@ import Base from '../layouts/Base.astro';
           searching: 'Ищем «[SEARCH_TERM]»…',
         },
       });
-      // Копируем итоговое сообщение Pagefind в живую область с задержкой,
-      // чтобы при наборе не объявлять каждое промежуточное «Ищем…».
+      // Живая область: итоговое сообщение Pagefind объявляется с задержкой 700 мс,
+      // чтобы при наборе не зачитывать каждый промежуточный результат (WCAG 4.1.3).
+      // Если «Ищем…» висит дольше 15 с (не загрузился движок или индекс — Pagefind
+      // в этом случае ждёт бесконечно), показываем честное сообщение и путь дальше.
       var status = document.getElementById('search-status');
+      var slowNotice = document.getElementById('search-slow');
       var announceTimer = null;
+      var slowTimer = null;
+      function currentMessage() {
+        var m = document.querySelector('#search .pagefind-ui__message');
+        return m ? m.textContent.trim() : '';
+      }
+      function isSearching(text) { return text.indexOf('Ищем') === 0; }
       new MutationObserver(function () {
+        var text = currentMessage();
+        if (isSearching(text)) {
+          if (!slowTimer) {
+            slowTimer = setTimeout(function () {
+              if (isSearching(currentMessage())) {
+                slowNotice.hidden = false;
+                status.textContent = slowNotice.textContent.trim().replace(/\s+/g, ' ');
+              }
+            }, 15000);
+          }
+        } else {
+          clearTimeout(slowTimer);
+          slowTimer = null;
+          slowNotice.hidden = true;
+        }
         clearTimeout(announceTimer);
+        if (!text) {
+          // поле очищено: сбрасываем, чтобы тот же итог при повторном запросе объявился снова
+          status.textContent = '';
+          return;
+        }
         announceTimer = setTimeout(function () {
-          var m = document.querySelector('#search .pagefind-ui__message');
-          var text = m ? m.textContent.trim() : '';
-          if (status.textContent !== text) status.textContent = text;
+          var t = currentMessage();
+          if (t && status.textContent !== t) status.textContent = t;
         }, 700);
       }).observe(document.getElementById('search'), { childList: true, subtree: true, characterData: true });
 
@@ -69,6 +101,20 @@ import Base from '../layouts/Base.astro';
   </script>
 
   <style is:inline>
+    /* Пустой поиск: Pagefind прячет «Очистить» прозрачностью, но кнопка остаётся
+       в порядке Tab и получает невидимый фокус — убираем её из обхода */
+    .search-box .pagefind-ui__search-clear.pagefind-ui__suppressed {
+      visibility: hidden;
+    }
+    /* Подсказка в поле: у Pagefind opacity .2 (≈1,5:1) — приглушённый цвет сайта, ≥4,5:1 */
+    .search-box input.pagefind-ui__search-input::placeholder {
+      color: var(--text-muted);
+      opacity: 1;
+    }
+    .search-slow {
+      margin-top: var(--space-4);
+      color: var(--text-muted);
+    }
     .search-box {
       --pagefind-ui-primary: var(--accent-dark);
       --pagefind-ui-text: var(--text);
