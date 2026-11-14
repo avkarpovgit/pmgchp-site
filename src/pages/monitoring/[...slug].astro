@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
+import { leadSectionTitle } from '../../utils/monitoring';
 
 export async function getStaticPaths() {
   const releases = await getCollection('monitoring');
@@ -12,6 +13,7 @@ export async function getStaticPaths() {
 
 const { release } = Astro.props;
 const { Content } = await render(release);
+const leadTitle = leadSectionTitle((release as { body?: string }).body ?? '');
 
 const formatDate = (d: Date) =>
   d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -29,6 +31,7 @@ const formatDate = (d: Date) =>
       <p class="post-date">{formatDate(release.data.date)}</p>
       <h1>{release.data.title}</h1>
     </header>
+    {leadTitle && <h2 class="visually-hidden" data-pagefind-ignore>{leadTitle}</h2>}
     <div class="prose feed-lead">
       <Content />
     </div>

@@ -5,6 +5,24 @@ import releases from '../data/monitoring.json';
 export const cleanPeriod = (p: string) =>
   p.replace(/\s*г\.?\s*$/, '').replace(/\s+-\s+/g, ' — ');
 
+/**
+ * Название скрытого заголовка h2 для начальной группы позиций выпуска.
+ * Позиции в тексте выпуска размечены `###`; если перед первой из них нет своего `##`,
+ * после h1 страницы сразу шёл бы h3 (пропуск уровня для экранного чтеца).
+ * null — вставлять нечего: выпуск начинается с `##` или не содержит заголовков.
+ * При блоке `## Регионы` начальная группа называется точнее: регионы — тоже позиции выпуска.
+ */
+export function leadSectionTitle(body: string): string | null {
+  const heads = [...body.matchAll(/^(#{2,3})\s+(.+?)\s*$/gm)].map((m) => ({
+    depth: m[1].length,
+    text: m[2].trim(),
+  }));
+  if (heads.length === 0 || heads[0].depth !== 3) return null;
+  return heads.some((h) => h.depth === 2 && h.text === 'Регионы')
+    ? 'Федеральные акты и практика'
+    : 'Позиции выпуска';
+}
+
 export type PendingAct = {
   title: string;
   url: string;
