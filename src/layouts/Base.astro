@@ -119,22 +119,25 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
     <title>{title}</title>
   </head>
   <body>
-    <header class="site-header">
+    <a class="skip-link" href="#content" data-pagefind-ignore>Перейти к содержанию</a>
+    <header class="site-header" data-pagefind-ignore="all">
       <div class="container">
-        <a href="/" class="site-title">
-          <img src="/images/logo-pmgchp.png" alt="" class="site-logo" width="28" height="28" />
-          Правовой мониторинг ГЧП
-        </a>
+        <div class="site-brand">
+          <a href="/" class="site-title">
+            <img src="/images/logo-pmgchp.png" alt="" class="site-logo" width="28" height="28" />
+            Правовой мониторинг ГЧП
+          </a>
+          <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Переключить светлую или тёмную тему" title="Переключить тему">◐</button>
+        </div>
         <nav class="site-nav">
           {navItems.map((item) => (
             <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
           ))}
           <a href="https://t.me/pmgchp" target="_blank" rel="noopener">Telegram&nbsp;↗</a>
-          <button id="theme-toggle" class="theme-toggle" aria-label="Переключить светлую/тёмную тему" title="Переключить тему">◐</button>
         </nav>
       </div>
     </header>
-    <main>
+    <main id="content" tabindex="-1">
       <div class="container">
         {crumbs.length > 0 && (
           <nav class="breadcrumbs" aria-label="Хлебные крошки">
@@ -149,7 +152,7 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
         <slot />
       </div>
     </main>
-    <footer class="site-footer">
+    <footer class="site-footer" data-pagefind-ignore="all">
       <div class="container">
         <span>© {new Date().getFullYear()} Александр Карпов</span>
         <span>
@@ -163,7 +166,7 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
           Материалы сайта — <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> ·
           <a href="/terms/">Пользовательское соглашение</a> ·
           <a href="/rss.xml">RSS</a> ·
-          <a href="#" id="cookie-reset">Настройки cookie</a>
+          <button type="button" id="cookie-reset" class="link-button">Настройки cookie</button>
         </span>
       </div>
     </footer>
@@ -179,6 +182,10 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
         }
         function refresh() {
           btn.textContent = effective() === 'dark' ? '☀' : '☾';
+          // имя называет действие, а не значок: диктор слышит, какая тема включится
+          var label = effective() === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему';
+          btn.setAttribute('aria-label', label);
+          btn.title = label;
           var meta = document.querySelector('meta[name="theme-color"]:not([media])');
           if (!meta) {
             meta = document.createElement('meta');
@@ -187,6 +194,9 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
           }
           meta.content = effective() === 'dark' ? '#221426' : '#fdfcfa';
         }
+        // смена системной темы при автоматическом режиме — обновить значок и имя кнопки
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.addEventListener) mq.addEventListener('change', refresh);
         btn.addEventListener('click', function () {
           var next = effective() === 'dark' ? 'light' : 'dark';
           document.documentElement.setAttribute('data-theme', next);
@@ -196,10 +206,23 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
         refresh();
       })();
 
+      // Ссылки, открывающиеся в новой вкладке, предупреждают об этом экранный диктор
+      (function () {
+        var links = document.querySelectorAll('a[target="_blank"]');
+        for (var i = 0; i < links.length; i++) {
+          var s = document.createElement('span');
+          s.className = 'visually-hidden';
+          s.textContent = ' (откроется в новой вкладке)';
+          links[i].appendChild(s);
+        }
+      })();
+
       // Cookie-согласие и Яндекс.Метрика — в отдельном блоке ниже:
       // счётчик грузится только после явного согласия пользователя.
 
-      // Свайп влево/вправо между разделами: тач на мобильных, трекпад на десктопе
+      // Свайп влево/вправо между разделами — только тач на мобильных.
+      // Горизонтальный жест трекпада больше не перехватывается: он уводил со страницы
+      // при случайном движении и ломал системный «назад/вперёд» (аудит UX 13.11.2026, UX-02).
       (function () {
         var sections = ['/', '/monitoring/', '/news/', '/blog/', '/experience/', '/search/'];
         var path = location.pathname;
@@ -253,24 +276,6 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
             go(dx);
           }, { passive: true });
         }
-
-        // --- горизонтальный жест трекпадом (десктоп) ---
-        var acc = 0, accTimer = null;
-        document.addEventListener('wheel', function (e) {
-          if (performance.now() < 800) return;                  // хвост инерции прошлого жеста
-          if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // вертикальная прокрутка
-          if (insideHScroll(e.target)) return;                  // прокрутка таблицы
-          if (inFormField(e.target)) return;                    // поля ввода
-          e.preventDefault(); // глушим системный «назад/вперёд», навигируем сами
-          acc += e.deltaX;
-          clearTimeout(accTimer);
-          accTimer = setTimeout(function () { acc = 0; }, 250);
-          if (Math.abs(acc) > 320) {
-            var dir = acc > 0 ? -1 : 1; // deltaX > 0 — смахивание влево → следующий раздел
-            acc = 0;
-            go(dir);
-          }
-        }, { passive: false });
       })();
     </script>
     <!-- Cookie-согласие + аналитика (Яндекс.Метрика, Google Analytics): счётчики грузятся ТОЛЬКО после явного согласия -->
@@ -279,7 +284,7 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
         var KEY = 'analyticsConsent'; // 'granted' | 'denied'
         var GA_ID = 'G-HCJT3ZZDR8';
 
-        // Ссылка «Настройки cookie» в футере — сбросить согласие и показать баннер снова
+        // Кнопка «Настройки cookie» в футере — сбросить согласие и показать баннер снова
         var resetLink = document.getElementById('cookie-reset');
         if (resetLink) {
           resetLink.addEventListener('click', function (ev) {
@@ -327,6 +332,8 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
         function showBanner() {
           var bar = document.createElement('div');
           bar.className = 'cookie-notice';
+          bar.setAttribute('role', 'region');
+          bar.setAttribute('aria-label', 'Согласие на cookie');
           bar.innerHTML = 'Мы используем <a href="/terms/">Яндекс.Метрику и Google Analytics</a> (cookie) для статистики посещаемости. ' +
             'Аналитика подключается только с вашего согласия. ' +
             '<button type="button" data-act="accept">Принять</button>' +
@@ -338,8 +345,20 @@ const breadcrumbLd = breadcrumb && breadcrumb.length ? {
             try { localStorage.setItem(KEY, act === 'accept' ? 'granted' : 'denied'); } catch (e) {}
             if (act === 'accept') loadAnalytics();
             bar.remove();
+            root.classList.remove('has-cookie-notice');
+            if (ro) ro.disconnect();
           });
-          document.body.appendChild(bar);
+          // Баннер — в начале DOM, сразу после «Перейти к содержанию»: с клавиатуры до «Принять»
+          // не нужно проходить всю страницу. Визуально он по-прежнему внизу (position: fixed).
+          var skip = document.querySelector('.skip-link');
+          if (skip) skip.after(bar); else document.body.prepend(bar);
+          // Под баннер резервируется место, чтобы он не закрывал фокус и конец страницы (WCAG 2.4.11).
+          var root = document.documentElement;
+          function syncHeight() { root.style.setProperty('--cookie-h', bar.offsetHeight + 'px'); }
+          syncHeight();
+          root.classList.add('has-cookie-notice');
+          var ro = window.ResizeObserver ? new ResizeObserver(syncHeight) : null;
+          if (ro) ro.observe(bar);
         }
 
         if (document.body) showBanner();

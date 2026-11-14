@@ -57,7 +57,8 @@
   /* Цвета */
   --border-strong: #d8d2c8;       /* плотнее hairline: разделители, крошки */
   --accent-contrast: var(--white); /* текст на залитом акценте */
-  --link-underline: rgba(212, 105, 30, 0.3);
+  /* Подчёркивание ссылок: ≥3:1 к фону, чтобы ссылка отличалась не только цветом (WCAG 1.4.1, техника G183) */
+  --link-underline: rgba(184, 85, 21, 0.8);
   /* Фокус-кольцо: сплошной акцент (не полупрозрачный) — контраст к фону ≥3:1 (WCAG AA) */
   --focus-ring: 0 0 0 3px var(--accent);
   /* Типографика: шкала кеглей, веса, интерлиньяж, трекинг */
@@ -121,7 +122,7 @@
     --warning-bg: #322615;
     --border-strong: #50395a;
     --accent-contrast: var(--brand-plum);
-    --link-underline: rgba(240, 138, 60, 0.32);
+    --link-underline: rgba(232, 127, 46, 0.7); /* ≥3:1 к фону */
     --focus-ring: 0 0 0 3px var(--accent);
   }
 }
@@ -143,7 +144,7 @@
   --warning-bg: #322615;
   --border-strong: #50395a;
   --accent-contrast: var(--brand-plum);
-  --link-underline: rgba(240, 138, 60, 0.32);
+  --link-underline: rgba(232, 127, 46, 0.7); /* ≥3:1 к фону */
   --focus-ring: 0 0 0 3px var(--accent);
 }
 
@@ -151,18 +152,28 @@
   border-color: var(--border);
 }
 
+/* Переключатель темы: цель нажатия 44 × 44 px (WCAG 2.5.8 требует ≥24, 44 — для касания) */
 .theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  margin: -0.5rem -0.75rem -0.5rem 0; /* не раздувать строку заголовка; зона нажатия заходит в поле контейнера */
   background: none;
   border: none;
+  border-radius: var(--radius-pill);
   cursor: pointer;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   line-height: 1;
   color: var(--text-muted);
-  padding: 0.1rem 0.2rem;
+  padding: 0;
 }
 
 .theme-toggle:hover {
   color: var(--accent-dark);
+  background: var(--card-bg);
 }
 
 /* Cookie notice */
@@ -192,9 +203,20 @@
   cursor: pointer;
 }
 
+/* --accent-fill, а не --accent: белый текст на #d4691e — 3,6:1, на #b85515 — 4,83:1 */
 .cookie-notice button:hover {
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--accent-contrast);
+}
+
+/* Пока баннер виден, конец страницы и фокус не уходят под него (WCAG 2.4.11).
+   --cookie-h выставляет скрипт баннера в Base.astro по фактической высоте. */
+html.has-cookie-notice {
+  scroll-padding-bottom: calc(var(--cookie-h, 0px) + var(--space-3));
+}
+
+html.has-cookie-notice body {
+  padding-bottom: var(--cookie-h, 0px);
 }
 
 * {
@@ -224,6 +246,46 @@ html {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* «Перейти к содержанию»: скрыта, пока не получит фокус с клавиатуры (WCAG 2.4.1) */
+.skip-link {
+  position: absolute;
+  left: var(--space-3);
+  top: -100px;
+  z-index: 200;
+  padding: var(--space-2) var(--space-4);
+  background: var(--card-bg);
+  color: var(--accent-dark);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-pill);
+}
+
+.skip-link:focus {
+  top: var(--space-3);
+}
+
+/* Цель перехода по «Перейти к содержанию»: фокус программный, кольцо вокруг всей страницы не нужно */
+main[tabindex="-1"]:focus,
+main[tabindex="-1"]:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Кнопка, оформленная как ссылка (действие без перехода, например «Настройки cookie») */
+.link-button {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--link-underline);
+  border-radius: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--accent-dark);
+  cursor: pointer;
+}
+
+.link-button:hover {
+  border-bottom-color: currentColor;
 }
 
 body {
@@ -257,9 +319,17 @@ a {
   transition: var(--transition-color);
 }
 
+/* Наведение — сплошным подчёркиванием, цвет текста прежний: --accent на светлом фоне даёт 3,5:1 (< 4,5:1) */
 a:hover {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+  border-bottom-color: currentColor;
+}
+
+/* Ссылки без нижней границы получают отклик на наведение подчёркиванием (раньше — сменой цвета) */
+.story-more a:hover,
+.draft-link:hover,
+.breadcrumbs a:hover,
+.prose sup a:hover {
+  text-decoration: underline;
 }
 
 /* Видимый фокус для клавиатурной навигации (a11y). Кольцо из --focus-ring
@@ -323,6 +393,23 @@ li { margin-bottom: var(--space-2); }
 
 .site-title:hover { color: var(--accent-dark); }
 
+/* Строка бренда: название слева, переключатель темы справа — на всех ширинах */
+.site-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-basis: 100%;
+}
+
+/* Название и переключатель — в одну строку и на 390 px */
+@media (max-width: 420px) {
+  .site-title { font-size: 1.05rem; }
+}
+@media (max-width: 380px) {
+  .site-title { font-size: 1rem; gap: 0.45rem; }
+}
+
 .site-nav {
   display: flex;
   align-items: center;
@@ -352,6 +439,17 @@ li { margin-bottom: var(--space-2); }
 .site-nav a[aria-current="page"]:hover {
   color: var(--accent-contrast);
   background: var(--accent-dark);
+}
+
+/* На узком экране меню укладывается в две строки (390 px), а не в три */
+@media (max-width: 600px) {
+  .site-nav {
+    gap: var(--space-1);
+    margin-left: calc(-1 * var(--space-2));
+  }
+  .site-nav a {
+    padding: 0.18rem 0.5rem;
+  }
 }
 
 /* Main */
@@ -574,17 +672,19 @@ main {
   font-size: 0.88rem;
 }
 
-.post-list h3 {
+/* Заголовки записей в списке — h2 (после h1 страницы, без пропуска уровня), размер прежний, как у h3 */
+.post-list h2 {
+  font-size: var(--fs-h3);
   margin-top: 0.2rem;
   margin-bottom: 0.3rem;
 }
 
-.post-list h3 a {
+.post-list h2 a {
   color: var(--text);
   border-bottom: none;
 }
 
-.post-list h3 a:hover { color: var(--accent-dark); }
+.post-list h2 a:hover { color: var(--accent-dark); }
 
 .post-list .excerpt {
   color: var(--text-muted);
@@ -1045,6 +1145,7 @@ main {
   font-family: var(--font-display);
   font-size: 1.12rem;
   font-weight: var(--fw-bold);
+  line-height: var(--lh-body); /* h2 (было div): заголовок месяца для навигации диктора, вид прежний */
   color: var(--text);
   margin: 1.7rem 0 0.6rem;
 }

@@ -37,10 +37,10 @@ const related = all
 <Base title={`${post.data.title} — Правовой мониторинг ГЧП`} description={post.data.description} ogType="article" publishDate={post.data.date} breadcrumb={[{ name: 'Главная', href: '/' }, { name: 'Блог', href: '/blog/' }, { name: post.data.title, href: `/blog/${post.id}/` }]}>
   <article>
     <header class="article-header">
-      <p class="post-date">{formatDate(post.data.date)}</p>
+      <p class="post-date" data-pagefind-ignore>{formatDate(post.data.date)}</p>
       <h1>{post.data.title}</h1>
       {post.data.tags.length > 0 && (
-        <div class="tag-cloud article-tags">
+        <div class="tag-cloud article-tags" data-pagefind-ignore="all">
           {post.data.tags.map((tag: string) => (
             <Tag name={tag} href={`/blog/tag/${tagSlug(tag)}/`} />
           ))}
@@ -53,7 +53,7 @@ const related = all
   </article>
 
   {related.length > 0 && (
-    <aside class="related">
+    <aside class="related" data-pagefind-ignore="all">
       <h2>Похожие записи</h2>
       <ul>
         {related.map((r) => (
