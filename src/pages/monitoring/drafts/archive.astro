@@ -40,6 +40,7 @@ function lawRef(data: { lawNumber?: string; lawDate?: Date }): string | null {
     <ul class="drafts-list">
       {items.map((d) => {
         const ref = lawRef(d.data);
+        const finalStage = d.data.stages.at(-1);
         return (
           <li class="draft-item" id={d.id}>
             <p class="feed-eyebrow">
@@ -65,9 +66,12 @@ function lawRef(data: { lawNumber?: string; lawDate?: Date }): string | null {
               <summary>Описание</summary>
               <div class="draft-body"><d.Content /></div>
             </details>
-            {d.data.stages && d.data.stages.length > 0 && (
+            {finalStage && (
               <details class="release-details draft-history">
-                <summary>История прохождения ({d.data.stages.length})</summary>
+                <summary>
+                  История прохождения ({d.data.stages.length}) · {formatDate(finalStage.date)} — <strong>{d.data.status}</strong>
+                  {d.data.lawNumber && ` (Федеральный закон № ${d.data.lawNumber})`}
+                </summary>
                 <ul class="stage-list">
                   {d.data.stages.slice().reverse().map((s) => (
                     <li><span class="stage-date">{formatDate(s.date)}</span> {s.stage}</li>
